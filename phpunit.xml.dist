@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+        colors="true"
+        bootstrap="./tests/bootstrap.php"
+        verbose="true"
+>
+    <testsuites>
+        <testsuite name="DiffMatchPatch Test Suite">
+            <directory suffix="Test.php">tests/DiffMatchPatch/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/DiffMatchPatch/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

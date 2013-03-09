@@ -1,0 +1,19 @@
+{
+    "name": "yetanotherape/diff-match-patch",
+    "description": "Port of google-diff-match-patch (https://code.google.com/p/google-diff-match-patch/) to PHP",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "yetanotherape",
+            "email": "yetanotherape@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+            "psr-0": { "DiffMatchPatch": "src/" }
+    }
+}
