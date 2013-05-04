@@ -322,31 +322,51 @@ class Diff
         // Simple string concat is even faster then implode() in PHP.
         $chars = '';
 
-        // Walk the text, pulling out a substring for each line.
-        // implode('\n', $text) would temporarily double our memory footprint.
-        // Modifying text would create many large strings to garbage collect.
-        $lineStart = 0;
-        $lineEnd = -1;
-        while ($lineEnd < mb_strlen($text) - 1) {
-            $lineEnd = mb_strpos($text, "\n", $lineStart);
-            // TODO refactor this hack
-            $lineEnd = $lineEnd === false ? -1 : $lineEnd;
-            if ($lineEnd == -1) {
-                $lineEnd = mb_strlen($text) - 1;
-            }
-            $line = mb_substr($text, $lineStart, $lineEnd + 1 - $lineStart);
-            $lineStart = $lineEnd + 1;
-
-            if (isset($lineHash[$line])) {
-                $chars .= $this->unicodeChr($lineHash[$line]);
-            } else {
-                $lineArray[] = $line;
-                $lineHash[$line] = count($lineArray) - 1;
-                $chars .= $this->unicodeChr(count($lineArray) - 1);
+        // TODO optimize code
+        // explode('\n', $text) would temporarily double our memory footprint,
+        // but mb_strpos() and mb_substr() work slow
+        $lines = explode("\n", $text);
+        foreach ($lines as $i => $line) {
+            if (mb_strlen($line)) {
+                if (isset($lines[$i + 1])) {
+                    $line .= "\n";
+                }
+                if (isset($lineHash[$line])) {
+                    $chars .= $this->unicodeChr($lineHash[$line]);
+                } else {
+                    $lineArray[] = $line;
+                    $lineHash[$line] = count($lineArray) - 1;
+                    $chars .= $this->unicodeChr(count($lineArray) - 1);
+                }
             }
         }
 
         return $chars;
+
+//        // Walk the text, pulling out a substring for each line.
+//        // explode('\n', $text) would temporarily double our memory footprint.
+//        // Modifying text would create many large strings to garbage collect.
+//        $lineStart = 0;
+//        $lineEnd = -1;
+//        $textLen = mb_strlen($text);
+//        while ($lineEnd < $textLen - 1) {
+//            $lineEnd = mb_strpos($text, "\n", $lineStart);
+//            if ($lineEnd === false) {
+//                $lineEnd = $textLen - 1;
+//            }
+//            $line = mb_substr($text, $lineStart, $lineEnd + 1 - $lineStart);
+//            $lineStart = $lineEnd + 1;
+//
+//            if (isset($lineHash[$line])) {
+//                $chars .= $this->unicodeChr($lineHash[$line]);
+//            } else {
+//                $lineArray[] = $line;
+//                $lineHash[$line] = count($lineArray) - 1;
+//                $chars .= $this->unicodeChr(count($lineArray) - 1);
+//            }
+//        }
+//
+//        return $chars;
     }
 
     /**
@@ -1118,7 +1138,7 @@ class Diff
             if ($this->getTimeout() <= 0) {
                 $deadline  = PHP_INT_MAX;
             } else {
-                $deadline = time() + $this->getTimeout();
+                $deadline = microtime(1) + $this->getTimeout();
             }
         }
 
@@ -1362,7 +1382,7 @@ class Diff
 
         for ($d = 0; $d < $maxD; $d++) {
             // Bail out if deadline is reached.
-            if (time() > $deadline) {
+            if (microtime(1) > $deadline) {
                 break;
             }
 
