@@ -168,7 +168,7 @@ class Diff
         $length = 1;
         while (true) {
             $pattern = mb_substr($text1, -$length);
-            $found = strpos($text2, $pattern);
+            $found = mb_strpos($text2, $pattern);
             if ($found === false) {
                 break;
             }
@@ -332,16 +332,14 @@ class Diff
                     $line .= "\n";
                 }
                 if (isset($lineHash[$line])) {
-                    $chars .= $this->unicodeChr($lineHash[$line]);
+                    $chars .= Utils::unicodeChr($lineHash[$line]);
                 } else {
                     $lineArray[] = $line;
                     $lineHash[$line] = count($lineArray) - 1;
-                    $chars .= $this->unicodeChr(count($lineArray) - 1);
+                    $chars .= Utils::unicodeChr(count($lineArray) - 1);
                 }
             }
         }
-
-        return $chars;
 
 //        // Walk the text, pulling out a substring for each line.
 //        // explode('\n', $text) would temporarily double our memory footprint.
@@ -358,15 +356,15 @@ class Diff
 //            $lineStart = $lineEnd + 1;
 //
 //            if (isset($lineHash[$line])) {
-//                $chars .= $this->unicodeChr($lineHash[$line]);
+//                $chars .= Utils::unicodeChr($lineHash[$line]);
 //            } else {
 //                $lineArray[] = $line;
 //                $lineHash[$line] = count($lineArray) - 1;
-//                $chars .= $this->unicodeChr(count($lineArray) - 1);
+//                $chars .= Utils::unicodeChr(count($lineArray) - 1);
 //            }
 //        }
-//
-//        return $chars;
+
+        return $chars;
     }
 
     /**
@@ -381,7 +379,7 @@ class Diff
         foreach ($diffs as &$diff) {
             $text = '';
             foreach (preg_split("//u", $diff[1], -1, PREG_SPLIT_NO_EMPTY) as $char) {
-                $text .= $lineArray[$this->unicodeOrd($char)];
+                $text .= $lineArray[Utils::unicodeOrd($char)];
             }
             $diff[1] = $text;
         }
@@ -965,7 +963,7 @@ class Diff
             $data = $change[1];
 
             if ($op == self::INSERT) {
-                $text[] = '+'. $this->encodeString($data);
+                $text[] = '+'. Utils::escapeString($data);
             } elseif ($op == self::DELETE) {
                 $text[] = '-' . mb_strlen($data);
             } else {
@@ -1005,7 +1003,7 @@ class Diff
                 case '+':
                     $diffs[] = array(
                         self::INSERT,
-                        $this->decodeString($param),
+                        Utils::unescapeString($param),
                     );
                     break;
                 case '-':
@@ -1486,52 +1484,4 @@ class Diff
 
         return array_merge($diffsA, $diffsB);
     }
-
-    /**
-     * Multibyte replacement for standard chr()
-     *
-     * @param int $code Character code.
-     *
-     * @return string Char with given code in UTF-8.
-     */
-    public function unicodeChr($code) {
-        // TODO this works by order of magnitude slower then chr() and limit
-        return mb_convert_encoding("&#{$code};", 'UTF-8', 'HTML-ENTITIES');
-    }
-
-    /**
-     * Multibyte replacement for standard ord()
-     *
-     * @param string $char Char in UTF-8
-     *
-     * @return int Code of given char.
-     */
-    public function unicodeOrd($char) {
-        $twoByteChar = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
-        return ord($twoByteChar[0]) + 256 * ord($twoByteChar[1]);
-    }
-
-    public function encodeString($string)
-    {
-        $string = rawurlencode($string);
-        $string = strtr($string, array (
-            '%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')', '%3B' => ';', '%2F' => '/', '%3F' => '?',
-            '%3A' => ':', '%40' => '@', '%26' => '&', '%3D' => '=', '%2B' => '+', '%24' => '$', '%2C' => ',', '%23' => '#', '%20' => ' '
-        ));
-        return $string;
-    }
-
-    public function decodeString($string)
-    {
-        $string = strtr($string, array (
-            '%21' => '%2521', '%2A' => '%252A', '%27' => "%2527", '%28' => '%2528', '%29' => '%2529', '%3B' => '%253B', '%2F' => '%252F', '%3F' => '%253F',
-            '%3A' => '%253A', '%40' => '%2540', '%26' => '%2526', '%3D' => '%253D', '%2B' => '%252B', '%24' => '%2524', '%2C' => '%252C', '%23' => '%2523', '%20' => '%2520'
-        ));
-        $string = rawurldecode($string);
-        return $string;
-    }
-
-//    function charCodeAt($str, $pos) {
-//        return mb_ord(mb_substr($str, $pos, 1));
-//    }
 }
