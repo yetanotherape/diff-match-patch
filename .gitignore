@@ -1,0 +1,26 @@
+# Project specific files #
+##########################
+/vendor
+/composer.lock
+/composer.phar
+/tmp
+
+
+# IDE generated files #
+#######################
+/.idea
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Stub for empty folders #
+##########################
+!.gitkeep
