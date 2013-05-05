@@ -14,7 +14,7 @@ class Utils {
      */
     public static function unicodeChr($code) {
         // TODO this works by order of magnitude slower then chr()
-        $code = str_pad($code, 4, 0, STR_PAD_LEFT);
+        $code = str_pad(dechex($code), 4, 0, STR_PAD_LEFT);
         return json_decode('"\u'.$code.'"');
     }
 
@@ -28,7 +28,6 @@ class Utils {
     public static function unicodeOrd($char) {
         $twoByteChar = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
         $code = ord($twoByteChar[0]) + 256 * ord($twoByteChar[1]);
-        $code = dechex($code);
         return $code;
     }
 

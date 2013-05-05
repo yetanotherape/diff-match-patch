@@ -110,7 +110,7 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         $lineList = array();
         $charList = array();
 
-        for ($x = 1; $x < $n + 1; $x++) {
+        for ($x = 1; $x <= $n; $x++) {
             $lineList[] = $x . "\n";
             $charList[] = Utils::unicodeChr($x);
         }
@@ -145,7 +145,7 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         $lineList = array();
         $charList = array();
 
-        for ($x = 1; $x < $n + 1; $x++) {
+        for ($x = 1; $x <= $n; $x++) {
             $lineList[] = $x . "\n";
             $charList[] = Utils::unicodeChr($x);
         }
@@ -726,13 +726,13 @@ class DiffTest extends \PHPUnit_Framework_TestCase
 
         // Test deltas with special characters.
         $diffs = array(
-            array(Diff::EQUAL, Utils::unicodeChr('0680') . " \x00 \t %"),
-            array(Diff::DELETE, Utils::unicodeChr('0681') . " \x01 \n ^"),
-            array(Diff::INSERT, Utils::unicodeChr('0682') . " \x02 \\ |"),
+            array(Diff::EQUAL, Utils::unicodeChr(0x0680) . " \x00 \t %"),
+            array(Diff::DELETE, Utils::unicodeChr(0x0681) . " \x01 \n ^"),
+            array(Diff::INSERT, Utils::unicodeChr(0x0682) . " \x02 \\ |"),
         );
 
         $text1 = $this->d->text1($diffs);
-        $this->assertEquals(Utils::unicodeChr('0680') . " \x00 \t %" . Utils::unicodeChr('0681') . " \x01 \n ^", $text1);
+        $this->assertEquals(Utils::unicodeChr(0x0680) . " \x00 \t %" . Utils::unicodeChr(0x0681) . " \x01 \n ^", $text1);
 
         $delta = $this->d->toDelta($diffs);
         $this->assertEquals("=7\t-7\t+%DA%82 %02 %5C %7C", $delta);
@@ -846,12 +846,12 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 array(Diff::DELETE, "a"),
-                array(Diff::INSERT, Utils::unicodeChr('0680')),
+                array(Diff::INSERT, Utils::unicodeChr(0x0680)),
                 array(Diff::EQUAL, "x"),
                 array(Diff::DELETE, "\t"),
                 array(Diff::INSERT, "\x00"),
             ),
-            $this->d->main("ax\t", Utils::unicodeChr('0680') . "x\x00", false)
+            $this->d->main("ax\t", Utils::unicodeChr(0x0680) . "x\x00", false)
         );
 
         // Overlaps.
