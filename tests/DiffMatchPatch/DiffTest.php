@@ -831,6 +831,37 @@ class DiffTest extends \PHPUnit_Framework_TestCase
             $this->d->main("abc", "abc", false)
         );
 
+        // Check '0' strings
+        $this->assertEquals(
+            array(
+                array(Diff::EQUAL, "0"),
+                array(Diff::INSERT, "X"),
+                array(Diff::EQUAL, "12"),
+                array(Diff::INSERT, "X"),
+                array(Diff::EQUAL, "0"),
+                array(Diff::INSERT, "X"),
+                array(Diff::EQUAL, "34"),
+                array(Diff::INSERT, "X"),
+                array(Diff::EQUAL, "0"),
+            ),
+            $this->d->main("0120340", "0X12X0X34X0", false)
+        );
+
+        $this->assertEquals(
+            array(
+                array(Diff::EQUAL, "0"),
+                array(Diff::DELETE, "X"),
+                array(Diff::EQUAL, "12"),
+                array(Diff::DELETE, "X"),
+                array(Diff::EQUAL, "0"),
+                array(Diff::DELETE, "X"),
+                array(Diff::EQUAL, "34"),
+                array(Diff::DELETE, "X"),
+                array(Diff::EQUAL, "0"),
+            ),
+            $this->d->main("0X12X0X34X0", "0120340", false)
+        );
+
 
         $this->assertEquals(
             array(

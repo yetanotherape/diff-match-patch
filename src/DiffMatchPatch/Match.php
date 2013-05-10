@@ -20,11 +20,20 @@ class Match {
      */
     protected $maxBits;
 
-    public function __construct(){
+    public function __construct()
+    {
         // PHP_INT_SIZE == 4 for 32bit platform, and 8 — for 64bit
         $this->maxBits = PHP_INT_SIZE * 8;
     }
 
+
+    /**
+     * @return float
+     */
+    public function getThreshold()
+    {
+        return $this->threshold;
+    }
 
     /**
      * @param float $threshold
@@ -35,11 +44,11 @@ class Match {
     }
 
     /**
-     * @return float
+     * @return int
      */
-    public function getThreshold()
+    public function getDistance()
     {
-        return $this->threshold;
+        return $this->distance;
     }
 
     /**
@@ -53,26 +62,26 @@ class Match {
     /**
      * @return int
      */
-    public function getDistance()
-    {
-        return $this->distance;
-    }
-
-    /**
-     * @param int $maxBits
-     */
-    public function setMaxBits($maxBits)
-    {
-        $this->maxBits = $maxBits;
-    }
-
-    /**
-     * @return int
-     */
     public function getMaxBits()
     {
         return $this->maxBits;
     }
+
+    /**
+     * @param int $maxBits
+     *
+     * @throws \RangeException If param greater than number of bits in int.
+     */
+    public function setMaxBits($maxBits)
+    {
+        if ($maxBits <= PHP_INT_SIZE * 8) {
+            $this->maxBits = $maxBits;
+        } else {
+            throw new \RangeException('Param greater than number of bits in int');
+        }
+    }
+
+
 
     /**
      * Locate the best instance of 'pattern' in 'text' near 'loc'.
@@ -94,7 +103,7 @@ class Match {
         if ($text == $pattern) {
             // Shortcut (potentially not guaranteed by the algorithm)
             return 0;
-        } elseif (!$text) {
+        } elseif ($text == '') {
             // Nothing to match.
             return -1;
         } elseif (mb_substr($text, $loc, mb_strlen($pattern)) == $pattern) {
@@ -114,13 +123,13 @@ class Match {
      * @param string $pattern The pattern to search for.
      * @param int    $loc     The location to search around.
      *
-     * @throws \LengthException If pattern longer then number of bits in int.
+     * @throws \RangeException If pattern longer than number of bits in int.
      * @return int Best match index or -1.
      */
     public function bitap($text, $pattern, $loc)
     {
         if ($this->getMaxBits() != 0 && $this->getMaxBits() < mb_strlen($pattern)) {
-            throw new \LengthException('Pattern too long for this application.');
+            throw new \RangeException('Pattern too long for this application.');
         }
 
         // Initialise the alphabet.

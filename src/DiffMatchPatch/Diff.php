@@ -21,10 +21,10 @@ class Diff
      */
     protected $editCost = 4;
 
-    public function __construct($charset = 'UTF-8')
+    public function __construct()
     {
-        // XXX this may do some side effects
-        mb_internal_encoding($charset);
+        // TODO This may cause some side effects.
+        mb_internal_encoding('UTF-8');
     }
 
     /**
@@ -70,7 +70,7 @@ class Diff
     public function commonPrefix($text1, $text2)
     {
         // Quick check for common null cases.
-        if (!$text1 || !$text2 || mb_substr($text1, 0, 1) != mb_substr($text2, 0, 1)) {
+        if ($text1 == '' || $text2 == '' || mb_substr($text1, 0, 1) != mb_substr($text2, 0, 1)) {
             return 0;
         }
         // Binary search.
@@ -105,7 +105,7 @@ class Diff
     public function commonSuffix($text1, $text2)
     {
         // Quick check for common null cases.
-        if (!$text1 || !$text2 || mb_substr($text1, -1, 1) != mb_substr($text2, -1, 1)) {
+        if ($text1 == '' || $text2 == '' || mb_substr($text1, -1, 1) != mb_substr($text2, -1, 1)) {
             return 0;
         }
         // Binary search.
@@ -319,7 +319,7 @@ class Diff
      */
     protected function linesToCharsMunge($text, array &$lineArray, array &$lineHash)
     {
-        // Simple string concat is even faster then implode() in PHP.
+        // Simple string concat is even faster than implode() in PHP.
         $chars = '';
 
         // TODO optimize code
@@ -570,14 +570,14 @@ class Diff
                 }
                 if ($diffs[$pointer - 1][1] != $bestEquality1) {
                     // We have an improvement, save it back to the diff.
-                    if ($bestEquality1) {
+                    if ($bestEquality1 != '') {
                         $diffs[$pointer - 1][1] = $bestEquality1;
                     } else {
                         array_splice($diffs, $pointer - 1, 1);
                         $pointer -= 1;
                     }
                     $diffs[$pointer][1] = $bestEdit;
-                    if ($bestEquality2) {
+                    if ($bestEquality2 != '') {
                         $diffs[$pointer + 1][1] = $bestEquality2;
                     } else {
                         array_splice($diffs, $pointer + 1, 1);
@@ -600,7 +600,7 @@ class Diff
      */
     protected function cleanupSemanticScore($one, $two)
     {
-        if (!$one || !$two) {
+        if ($one == '' || $two == '') {
             // Edges are the best.
             return 6;
         }
@@ -680,9 +680,9 @@ class Diff
                 }
                 // Eliminate an equality that is smaller or equal to the edits on both sides of it.
                 if (
-                    $lastequality
-                    && mb_strlen($lastequality) <= max($length_insertions1, $length_deletions1)
-                    && mb_strlen($lastequality) <= max($length_insertions2, $length_deletions2)
+                    $lastequality != '' &&
+                    mb_strlen($lastequality) <= max($length_insertions1, $length_deletions1) &&
+                    mb_strlen($lastequality) <= max($length_insertions2, $length_deletions2)
                 ) {
                     $insertPointer = array_pop($equalities);
                     // Duplicate record.
@@ -823,12 +823,12 @@ class Diff
                 // <ins>A</ins><del>B</del>X<del>C</del>
                 // TODO refactor condition
                 if (
-                    $lastequality
-                    && (
-                        ($pre_ins && $pre_del && $post_ins && $post_del)
-                        || (
-                            mb_strlen($lastequality) < $this->getEditCost() / 2
-                            && ($pre_ins + $pre_del + $post_del + $post_ins == 3)
+                    $lastequality != '' &&
+                    (
+                        ($pre_ins && $pre_del && $post_ins && $post_del) ||
+                        (
+                            mb_strlen($lastequality) < $this->getEditCost() / 2 &&
+                            ($pre_ins + $pre_del + $post_del + $post_ins == 3)
                         )
                     )
                 ) {
@@ -1146,7 +1146,7 @@ class Diff
 
         // Check for equality (speedup).
         if ($text1 == $text2) {
-            if ($text1) {
+            if ($text1 != '') {
                 return array(
                     array(self::EQUAL, $text1),
                 );
@@ -1178,10 +1178,10 @@ class Diff
         $diffs = $this->compute($text1, $text2, $checklines, $deadline);
 
         // Restore the prefix and suffix.
-        if ($commonPrefix) {
+        if ($commonPrefix != '') {
             array_unshift($diffs, array(self::EQUAL, $commonPrefix));
         }
-        if ($commonSuffix) {
+        if ($commonSuffix != '') {
             array_push($diffs, array(self::EQUAL, $commonSuffix));
         }
 
@@ -1205,14 +1205,14 @@ class Diff
      */
     protected function compute($text1, $text2, $checklines, $deadline)
     {
-        if (!$text1) {
+        if ($text1 == '') {
             // Just add some text (speedup).
             return array(
                 array(self::INSERT, $text2),
             );
         }
 
-        if (!$text2) {
+        if ($text2 == '') {
             // Just delete some text (speedup).
             return array(
                 array(self::DELETE, $text1),
