@@ -77,7 +77,7 @@ class Patch
     /**
      * @return Match
      */
-    public function getMatch()
+    protected function getMatch()
     {
         return $this->match;
     }
@@ -85,7 +85,7 @@ class Patch
     /**
      * @return Diff
      */
-    public function getDiff()
+    protected function getDiff()
     {
         return $this->diff;
     }
