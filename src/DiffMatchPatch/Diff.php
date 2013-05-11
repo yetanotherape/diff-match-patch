@@ -5,9 +5,15 @@ namespace DiffMatchPatch;
 
 class Diff
 {
-    // The data structure representing a diff is an array of arrays:
-    // [[Diff::DELETE, "Hello"], [Diff::INSERT, "Goodbye"], [Diff::EQUAL, " world."]]
-    // which means: delete "Hello", add "Goodbye" and keep " world."
+    /**
+     * The data structure representing a diff is an array of arrays:
+     * array(
+     *      array(Diff::DELETE, "Hello"),
+     *      array(Diff::INSERT, "Goodbye"),
+     *      array(Diff::EQUAL, " world."),
+     * )
+     * which means: delete "Hello", add "Goodbye" and keep " world."
+     */
     const DELETE = -1;
     const INSERT = 1;
     const EQUAL  = 0;
