@@ -50,7 +50,7 @@ class Utils {
      * @return int Code of given char.
      */
     public static function unicodeOrd($char) {
-        $twoByteChar = mb_convert_encoding($char, 'UCS-2LE', 'UTF-8');
+        $twoByteChar = iconv('UTF-8', 'UCS-2LE', $char);
         $code = ord($twoByteChar[0]) + 256 * ord($twoByteChar[1]);
         return $code;
     }
