@@ -1,19 +1,32 @@
 {
     "name": "yetanotherape/diff-match-patch",
-    "description": "Port of google-diff-match-patch (https://code.google.com/p/google-diff-match-patch/) to PHP",
-    "minimum-stability": "stable",
+    "description": "Port of the google-diff-match-patch (https://code.google.com/p/google-diff-match-patch/) lib to PHP",
+    "type": "library",
+    "keywords": ["Diff", "Match", "Patch", "Fuzzy search"],
+    "homepage": "https://code.google.com/p/google-diff-match-patch/",
+    "license": "Apache-2.0",
     "authors": [
         {
-            "name": "yetanotherape",
+            "name": "Daniil Skrobov",
             "email": "yetanotherape@gmail.com"
+        },
+        {
+            "name": "Neil Fraser",
+            "email": "fraser@google.com",
+            "homepage": "http://neil.fraser.name/"
         }
     ],
     "require": {
+        "php": ">=5.3",
+        "ext-mbstring": "*",
+        "lib-iconv": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
-        "psr-0": { "DiffMatchPatch": "src/" }
+        "psr-0": {
+            "DiffMatchPatch": "src/"
+        }
     }
 }

@@ -1,13 +1,34 @@
 <?php
-
+/*
+ * DiffMatchPatch is a port of the google-diff-match-patch (http://code.google.com/p/google-diff-match-patch/)
+ * lib to PHP.
+ *
+ * (c) 2006 Google Inc.
+ * (c) 2013 Daniil Skrobov <yetanotherape@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 namespace DiffMatchPatch;
 
 /**
- * Class DiffMatchPatch implements the same API as all other google-diff-match-patch libs.
- * It was created for compatibility reason only.
+ * Functions for diff, match and patch.
  *
- * @package DiffMatchPatch
+ * Computes the difference between two texts to create a patch. Applies the patch onto another text,
+ * allowing for errors.
+ * This class implements the same API as all other google-diff-match-patch libs. It was created for
+ * compatibility reason only.
+ *
  * @property float Diff_Timeout          Number of seconds to map a diff before giving up (0 for infinity).
  * @property int   Diff_EditCost         Cost of an empty edit operation in terms of edit characters.
  * @property float Match_Threshold       At what point is no match declared (0.0 = perfection, 1.0 = very loose).
@@ -20,6 +41,10 @@ namespace DiffMatchPatch;
  *                                       1.0 = very loose).  Note that Match_Threshold controls how closely the
  *                                       end points of a delete need to match.
  * @property int   Patch_Margin          Chunk size for context length.
+ *
+ * @package DiffMatchPatch
+ * @author Neil Fraser <fraser@google.com>
+ * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
 class DiffMatchPatch
 {
