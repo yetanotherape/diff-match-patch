@@ -37,6 +37,11 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $text1 = file_get_contents(__DIR__ . '/fixtures/S_performance1.txt');
         $text2 = file_get_contents(__DIR__ . '/fixtures/S_performance2.txt');
 
+        // Warm up
+        $diff = new Diff();
+        $diff->setTimeout(0);
+        $diff->main($text1, $text2);
+
         $timeStart = microtime(1);
         $memoryStart = memory_get_usage();
 
@@ -60,6 +65,11 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $text2 = file_get_contents(__DIR__ . '/fixtures/S_performance2.txt');
         $n = 20;
 
+        // Warm up
+        $diff = new Diff();
+        $diff->setTimeout(0);
+        $diff->main($text1, $text2);
+
         $timeStart = microtime(1);
         $memoryStart = memory_get_usage();
 
@@ -67,7 +77,6 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $diff = new Diff();
             $diff->setTimeout(0);
             $diff->main($text1, $text2);
-            unset($diff);
         }
 
         $timeElapsed = microtime(1) - $timeStart;
