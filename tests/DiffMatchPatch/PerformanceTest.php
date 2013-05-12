@@ -24,6 +24,7 @@ namespace DiffMatchPatch;
 /**
  * @package DiffMatchPatch
  * @author Daniil Skrobov <yetanotherape@gmail.com>
+ * @runTestsInSeparateProcesses
  */
 class PerformanceTest extends \PHPUnit_Framework_TestCase
 {
