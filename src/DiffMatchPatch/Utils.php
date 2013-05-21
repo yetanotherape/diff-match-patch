@@ -38,7 +38,7 @@ class Utils {
      */
     public static function unicodeChr($code) {
         // TODO this works by order of magnitude slower then chr()
-        $code = str_pad(dechex($code), 4, 0, STR_PAD_LEFT);
+        $code = sprintf("%04x", $code);
         return json_decode('"\u'.$code.'"');
     }
 
