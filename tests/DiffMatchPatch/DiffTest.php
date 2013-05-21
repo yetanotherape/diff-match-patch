@@ -979,7 +979,7 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         // Theoretically this test could fail very occasionally if the
         // OS task swaps or locks up for a second at the wrong moment.
         // TODO must be $this->d->getTimeout() * 2, but it need some optimization of linesToCharsMunge()
-        $this->assertLessThan($this->d->getTimeout() * 10, $endTime - $startTime);
+        $this->assertLessThan($this->d->getTimeout() * 15, $endTime - $startTime);
         $this->d->setTimeout(0);
 
         // Test the linemode speedup.
