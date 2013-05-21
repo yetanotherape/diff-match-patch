@@ -1,4 +1,4 @@
-Diff-Match-Patch
+Diff-Match-Patch [![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.png)](https://travis-ci.org/yetanotherape/diff-match-patch)
 ================
 The Diff Match and Patch libraries offer robust algorithms to perform the operations required for synchronizing plain text:
 
@@ -7,6 +7,8 @@ The Diff Match and Patch libraries offer robust algorithms to perform the operat
 * applies patches onto changed base text.
 
 This is the port of [google-diff-match-patch](https://code.google.com/p/google-diff-match-patch/) lib to PHP.
+
+**NOTE: This is alpha software and is under development.**
 
 Diff
 ----
