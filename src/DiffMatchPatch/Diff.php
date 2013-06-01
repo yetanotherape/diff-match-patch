@@ -51,11 +51,35 @@ class Diff
      * @var int Cost of an empty edit operation in terms of edit characters.
      */
     protected $editCost = 4;
+    /**
+     * @var Change[]
+     */
+    protected $changes = array();
+    /**
+     * @var DiffToolkit
+     */
+    protected $toolkit;
 
-    public function __construct()
+    /**
+     * Init object and call main(), if texts passed.
+     *
+     * @param string|null $text1
+     * @param string|null $text2
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($text1 = null, $text2 = null)
     {
-        // TODO This may cause some side effects.
+        // FIXME This may cause some side effects.
         mb_internal_encoding('UTF-8');
+
+        $this->toolkit = new DiffToolkit();
+
+        if (isset($text1, $text2)) {
+            $this->main($text1, $text2);
+        } elseif (isset($text1) || isset($text2)) {
+            throw new \InvalidArgumentException('Only one text parameter passed');
+        }
     }
 
     /**
@@ -68,10 +92,14 @@ class Diff
 
     /**
      * @param $timeout
+     *
+     * @return $this
      */
     public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
+
+        return $this;
     }
 
     /**
@@ -84,338 +112,60 @@ class Diff
 
     /**
      * @param int $editCost
+     *
+     * @return $this
      */
     public function setEditCost($editCost)
     {
         $this->editCost = $editCost;
+
+        return $this;
     }
 
     /**
-     * Determine the common prefix of two strings.
-     *
-     * @param string $text1 First string.
-     * @param string $text2 Second string.
-     *
-     * @return int The number of characters common to the start of each string.
+     * @return Change[]
      */
-    public function commonPrefix($text1, $text2)
+    public function getChanges()
     {
-        // Quick check for common null cases.
-        if ($text1 == '' || $text2 == '' || mb_substr($text1, 0, 1) != mb_substr($text2, 0, 1)) {
-            return 0;
-        }
-        // Binary search.
-        // Performance analysis: http://neil.fraser.name/news/2007/10/09/
-        $pointermin = 0;
-        $pointermax = min(mb_strlen($text1), mb_strlen($text2));
-        $pointermid = $pointermax;
-        $pointerstart = 0;
-        while ($pointermin < $pointermid) {
-            if (mb_substr($text1, $pointerstart, $pointermid - $pointerstart) == mb_substr($text2, $pointerstart,
-                $pointermid - $pointerstart)
-            ) {
-                $pointermin = $pointermid;
-                $pointerstart = $pointermin;
-            } else {
-                $pointermax = $pointermid;
-            }
-            $pointermid = (int)(($pointermax - $pointermin) / 2) + $pointermin;
-        }
-
-        return $pointermid;
+        return $this->changes;
     }
 
     /**
-     * Determine the common suffix of two strings.
+     * @param \DiffMatchPatch\Change[] $changes
      *
-     * @param string $text1 First string.
-     * @param string $text2 Second string.
-     *
-     * @return int The number of characters common to the end of each string.
+     * @return $this
      */
-    public function commonSuffix($text1, $text2)
+    public function setChanges($changes)
     {
-        // Quick check for common null cases.
-        if ($text1 == '' || $text2 == '' || mb_substr($text1, -1, 1) != mb_substr($text2, -1, 1)) {
-            return 0;
-        }
-        // Binary search.
-        // Performance analysis: http://neil.fraser.name/news/2007/10/09/
-        $pointermin = 0;
-        $pointermax = min(mb_strlen($text1), mb_strlen($text2));
-        $pointermid = $pointermax;
-        $pointerend = 0;
-        while ($pointermin < $pointermid) {
-            if (mb_substr($text1, -$pointermid, $pointermid - $pointerend) == mb_substr($text2, -$pointermid,
-                $pointermid - $pointerend)
-            ) {
-                $pointermin = $pointermid;
-                $pointerend = $pointermin;
-            } else {
-                $pointermax = $pointermid;
-            }
-            $pointermid = (int)(($pointermax - $pointermin) / 2) + $pointermin;
-        }
+        $this->changes = $changes;
 
-        return $pointermid;
+        return $this;
     }
 
     /**
-     * Determine if the suffix of one string is the prefix of another.
-     *
-     * @param string $text1 First string.
-     * @param string $text2 Second string.
-     *
-     * @return int The number of characters common to the end of the first string and the start of the second string.
+     * @return \DiffMatchPatch\DiffToolkit
      */
-    public function commontOverlap($text1, $text2)
+    public function getToolkit()
     {
-        // Cache the text lengths to prevent multiple calls.
-        $text1_length = mb_strlen($text1);
-        $text2_length = mb_strlen($text2);
-
-        // Eliminate the null case.
-        if (!$text1_length || !$text2_length) {
-            return 0;
-        }
-
-        // Truncate the longer string.
-        if ($text1_length > $text2_length) {
-            $text1 = mb_substr($text1, -$text2_length);
-        } elseif ($text1_length < $text2_length) {
-            $text2 = mb_substr($text2, 0, $text1_length);
-        }
-        $text_length = min($text1_length, $text2_length);
-
-        // Quick check for the worst case.
-        if ($text1 == $text2) {
-            return $text_length;
-        }
-
-        // Start by looking for a single character match
-        // and increase length until no match is found.
-        // Performance analysis: http://neil.fraser.name/news/2010/11/04/
-        $best = 0;
-        $length = 1;
-        while (true) {
-            $pattern = mb_substr($text1, -$length);
-            $found = mb_strpos($text2, $pattern);
-            if ($found === false) {
-                break;
-            }
-            $length += $found;
-            if ($found == 0 || mb_substr($text1, -$length) == mb_substr($text2, 0, $length)) {
-                $best = $length;
-                $length += 1;
-            }
-        }
-
-        return $best;
+        return $this->toolkit;
     }
+
+
 
     /**
-     * Do the two texts share a substring which is at least half the length of the longer text?
-     * This speedup can produce non-minimal diffs.
+     * @param \DiffMatchPatch\DiffToolkit $toolkit
      *
-     * @param string $text1 First string.
-     * @param string $text2 Second string.
-     *
-     * @return null|array Five element array, containing the prefix of text1, the suffix of text1,
-     * the prefix of text2, the suffix of text2 and the common middle.  Or null if there was no match.
+     * @return $this
      */
-    public function halfMatch($text1, $text2)
+    public function setToolkit($toolkit)
     {
-        if ($this->timeout <= 0) {
-            // Don't risk returning a non-optimal diff if we have unlimited time.
-            return null;
-        }
+        $this->toolkit = $toolkit;
 
-        if (mb_strlen($text1) > mb_strlen($text2)) {
-            $longtext = $text1;
-            $shorttext = $text2;
-        } else {
-            $shorttext = $text1;
-            $longtext = $text2;
-        }
-
-        if (mb_strlen($longtext) < 4 || mb_strlen($shorttext) * 2 < mb_strlen(mb_strlen($longtext))) {
-            // Pointless
-            return null;
-        }
-
-        // First check if the second quarter is the seed for a half-match.
-        $hm1 = $this->halfMatchI($longtext, $shorttext, (int)((mb_strlen($longtext) + 3) / 4));
-        // Check again based on the third quarter.
-        $hm2 = $this->halfMatchI($longtext, $shorttext, (int)((mb_strlen($longtext) + 1) / 2));
-
-        if (empty($hm1) && empty($hm2)) {
-            return null;
-        } elseif (empty($hm2)) {
-            $hm = $hm1;
-        } elseif (empty($hm1)) {
-            $hm = $hm2;
-        } else {
-            // Both matched.  Select the longest.
-            if (mb_strlen($hm1[4] > $hm2[4])) {
-                $hm = $hm1;
-            } else {
-                $hm = $hm2;
-            }
-        }
-
-        // A half-match was found, sort out the return data.
-        if (mb_strlen($text1) > mb_strlen($text2)) {
-            return array($hm[0], $hm[1], $hm[2], $hm[3], $hm[4]);
-        } else {
-            return array($hm[2], $hm[3], $hm[0], $hm[1], $hm[4]);
-        }
+        return $this;
     }
 
-    /**
-     * Does a substring of shorttext exist within longtext such that the substring
-     * is at least half the length of longtext?
-     *
-     * @param string $longtext  Longer string.
-     * @param string $shorttext Shorter string.
-     * @param int    $i         Start index of quarter length substring within longtext.
-     *
-     * @return null|array Five element array, containing the prefix of longtext, the suffix of longtext,
-     * the prefix of shorttext, the suffix of shorttext and the common middle.  Or null if there was no match.
-     */
-    protected function halfMatchI($longtext, $shorttext, $i)
-    {
-        $seed = mb_substr($longtext, $i, (int)(mb_strlen($longtext) / 4));
-        $best_common = $best_longtext_a = $best_longtext_b = $best_shorttext_a = $best_shorttext_b = '';
-
-        $j = mb_strpos($shorttext, $seed);
-        while ($j !== false) {
-            $prefixLegth = $this->commonPrefix(mb_substr($longtext, $i), mb_substr($shorttext, $j));
-            $suffixLegth = $this->commonSuffix(mb_substr($longtext, 0, $i), mb_substr($shorttext, 0, $j));
-            if (mb_strlen($best_common) < $suffixLegth + $prefixLegth) {
-                $best_common = mb_substr($shorttext, $j - $suffixLegth, $suffixLegth) . mb_substr($shorttext, $j,
-                    $prefixLegth);
-                $best_longtext_a = mb_substr($longtext, 0, $i - $suffixLegth);
-                $best_longtext_b = mb_substr($longtext, $i + $prefixLegth);
-                $best_shorttext_a = mb_substr($shorttext, 0, $j - $suffixLegth);
-                $best_shorttext_b = mb_substr($shorttext, $j + $prefixLegth);
-            }
-            $j = mb_strpos($shorttext, $seed, $j + 1);
-        }
 
 
-        if (mb_strlen($best_common) * 2 >= mb_strlen($longtext)) {
-            return array($best_longtext_a, $best_longtext_b, $best_shorttext_a, $best_shorttext_b, $best_common);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Split two texts into an array of strings.  Reduce the texts to a string of hashes where each
-     * Unicode character represents one line.
-     *
-     * @param string $text1 First string.
-     * @param string $text2 Second string.
-     *
-     * @return array Three element array, containing the encoded text1, the encoded text2 and the array
-     * of unique strings.  The zeroth element of the array of unique strings is intentionally blank.
-     */
-    public function linesToChars($text1, $text2)
-    {
-        // e.g. $lineArray[4] == "Hello\n"
-        $lineArray = array();
-        // e.g. $lineHash["Hello\n"] == 4
-        $lineHash = array();
-
-        // "\x00" is a valid character, but various debuggers don't like it.
-        // So we'll insert a junk entry to avoid generating a null character.
-        $lineArray[] = '';
-
-        $chars1 = $this->linesToCharsMunge($text1, $lineArray, $lineHash);
-        $chars2 = $this->linesToCharsMunge($text2, $lineArray, $lineHash);
-
-        return array($chars1, $chars2, $lineArray);
-    }
-
-    /**
-     * Split a text into an array of strings.  Reduce the texts to a string of hashes where each
-     * Unicode character represents one line.
-     * Modifies $lineArray and $lineHash. TODO try to fix it!
-     *
-     * @param string $text String to encode.
-     * @param array  $lineArray
-     * @param array  $lineHash
-     *
-     * @return string Encoded string.
-     */
-    protected function linesToCharsMunge($text, array &$lineArray, array &$lineHash)
-    {
-        // Simple string concat is even faster than implode() in PHP.
-        $chars = '';
-
-        // TODO optimize code
-        // explode('\n', $text) would temporarily double our memory footprint,
-        // but mb_strpos() and mb_substr() work slow
-        $lines = explode("\n", $text);
-        foreach ($lines as $i => $line) {
-            if (mb_strlen($line)) {
-                if (isset($lines[$i + 1])) {
-                    $line .= "\n";
-                }
-                if (isset($lineHash[$line])) {
-                    $chars .= Utils::unicodeChr($lineHash[$line]);
-                } else {
-                    $lineArray[] = $line;
-                    $lineHash[$line] = count($lineArray) - 1;
-                    $chars .= Utils::unicodeChr(count($lineArray) - 1);
-                }
-            }
-        }
-
-//        // Walk the text, pulling out a substring for each line.
-//        // explode('\n', $text) would temporarily double our memory footprint.
-//        // Modifying text would create many large strings to garbage collect.
-//        $lineStart = 0;
-//        $lineEnd = -1;
-//        $textLen = mb_strlen($text);
-//        while ($lineEnd < $textLen - 1) {
-//            $lineEnd = mb_strpos($text, "\n", $lineStart);
-//            if ($lineEnd === false) {
-//                $lineEnd = $textLen - 1;
-//            }
-//            $line = mb_substr($text, $lineStart, $lineEnd + 1 - $lineStart);
-//            $lineStart = $lineEnd + 1;
-//
-//            if (isset($lineHash[$line])) {
-//                $chars .= Utils::unicodeChr($lineHash[$line]);
-//            } else {
-//                $lineArray[] = $line;
-//                $lineHash[$line] = count($lineArray) - 1;
-//                $chars .= Utils::unicodeChr(count($lineArray) - 1);
-//            }
-//        }
-
-        return $chars;
-    }
-
-    /**
-     * Rehydrate the text in a diff from a string of line hashes to real lines of text.
-     * Modifies $diffs. TODO try to fix it!
-     *
-     * @param array $diffs Array of diff arrays.
-     * @param array $lineArray Array of unique strings.
-     */
-    public function charsToLines(&$diffs, $lineArray)
-    {
-        foreach ($diffs as &$diff) {
-            $text = '';
-            foreach (preg_split("//u", $diff[1], -1, PREG_SPLIT_NO_EMPTY) as $char) {
-                $text .= $lineArray[Utils::unicodeOrd($char)];
-            }
-            $diff[1] = $text;
-        }
-        unset($diff);
-    }
 
     /**
      * Reorder and merge like edit sections.  Merge equalities.
@@ -450,7 +200,7 @@ class Diff
                 if ($count_delete + $count_insert > 1) {
                     if ($count_delete != 0 && $count_insert != 0) {
                         // Factor out any common prefixies.
-                        $commonlength = $this->commonPrefix($text_insert, $text_delete);
+                        $commonlength = $this->getToolkit()->commonPrefix($text_insert, $text_delete);
                         if ($commonlength != 0) {
                             $x = $pointer - $count_delete - $count_insert - 1;
                             if ($x >= 0 && $diffs[$x][0] == self::EQUAL) {
@@ -466,7 +216,7 @@ class Diff
                             $text_delete = mb_substr($text_delete, $commonlength);
                         }
                         // Factor out any common suffixies.
-                        $commonlength = $this->commonSuffix($text_insert, $text_delete);
+                        $commonlength = $this->getToolkit()->commonSuffix($text_insert, $text_delete);
                         if ($commonlength != 0) {
                             $diffs[$pointer][1] = mb_substr($text_insert, -$commonlength) . $diffs[$pointer][1];
                             $text_insert = mb_substr($text_insert, 0, -$commonlength);
@@ -573,7 +323,7 @@ class Diff
                 $equality2 = $diffs[$pointer + 1][1];
 
                 // First, shift the edit as far left as possible.
-                $commonOffset = $this->commonSuffix($equality1, $edit);
+                $commonOffset = $this->getToolkit()->commonSuffix($equality1, $edit);
                 if ($commonOffset) {
                     $commonString = mb_substr($edit, -$commonOffset);
                     $equality1 = mb_substr($equality1, 0, -$commonOffset);
@@ -761,8 +511,8 @@ class Diff
             if ($diffs[$pointer - 1][0] == self::DELETE && $diffs[$pointer][0] == self::INSERT) {
                 $deletion = $diffs[$pointer - 1][1];
                 $insertion = $diffs[$pointer][1];
-                $overlap_length1 = $this->commontOverlap($deletion, $insertion);
-                $overlap_length2 = $this->commontOverlap($insertion, $deletion);
+                $overlap_length1 = $this->getToolkit()->commontOverlap($deletion, $insertion);
+                $overlap_length2 = $this->getToolkit()->commontOverlap($insertion, $deletion);
 
                 if ($overlap_length1 >= $overlap_length2) {
                     if ($overlap_length1 >= mb_strlen($deletion) / 2 || $overlap_length1 >= mb_strlen($insertion) / 2) {
@@ -1186,7 +936,7 @@ class Diff
         }
 
         // Trim off common prefix (speedup).
-        $commonLength = $this->commonPrefix($text1, $text2);
+        $commonLength = $this->getToolkit()->commonPrefix($text1, $text2);
         if ($commonLength == 0) {
             $commonPrefix = '';
         } else {
@@ -1196,7 +946,7 @@ class Diff
         }
 
         // Trim off common suffix (speedup).
-        $commonLength = $this->commonSuffix($text1, $text2);
+        $commonLength = $this->getToolkit()->commonSuffix($text1, $text2);
         if ($commonLength == 0) {
             $commonSuffix = '';
         } else {
@@ -1284,23 +1034,26 @@ class Diff
             return $diffs;
         }
 
-        // Check to see if the problem can be split in two.
-        $hm = $this->halfMatch($text1, $text2);
-        if ($hm) {
-            // A half-match was found, sort out the return data.
-            list($text1_a, $text1_b, $text2_a, $text2_b, $mid_common) = $hm;
-            // Send both pairs off for separate processing.
-            $diffs_a = $this->main($text1_a, $text2_a, $checklines, $deadline);
-            $diffs_b = $this->main($text1_b, $text2_b, $checklines, $deadline);
-            // Merge the results.
-            $diffs = array_merge(
-                $diffs_a,
-                array(
-                    array(self::EQUAL, $mid_common),
-                ),
-                $diffs_b
-            );
-            return $diffs;
+        // Don't risk returning a non-optimal diff if we have unlimited time.
+        if ($this->getTimeout() > 0) {
+            // Check to see if the problem can be split in two.
+            $hm = $this->getToolkit()->halfMatch($text1, $text2);
+            if ($hm) {
+                // A half-match was found, sort out the return data.
+                list($text1_a, $text1_b, $text2_a, $text2_b, $mid_common) = $hm;
+                // Send both pairs off for separate processing.
+                $diffs_a = $this->main($text1_a, $text2_a, $checklines, $deadline);
+                $diffs_b = $this->main($text1_b, $text2_b, $checklines, $deadline);
+                // Merge the results.
+                $diffs = array_merge(
+                    $diffs_a,
+                    array(
+                        array(self::EQUAL, $mid_common),
+                    ),
+                    $diffs_b
+                );
+                return $diffs;
+            }
         }
 
         if ($checklines && mb_strlen($text1) > 100 && mb_strlen($text2) > 100) {
@@ -1323,12 +1076,12 @@ class Diff
     protected function lineMode($text1, $text2, $deadline)
     {
         // Scan the text on a line-by-line basis first.
-        list($text1, $text2, $lineArray) = $this->linesToChars($text1, $text2);
+        list($text1, $text2, $lineArray) = $this->getToolkit()->linesToChars($text1, $text2);
 
         $diffs = $this->main($text1, $text2, false, $deadline);
 
         // Convert the diff back to original text.
-        $this->charsToLines($diffs, $lineArray);
+        $this->getToolkit()->charsToLines($diffs, $lineArray);
 
         // Eliminate freak matches (e.g. blank lines)
         $this->cleanupSemantic($diffs);
@@ -1386,7 +1139,7 @@ class Diff
      *
      * @return array Array of diff arrays.
      */
-    public function bisect($text1, $text2, $deadline)
+    protected function bisect($text1, $text2, $deadline)
     {
         // Cache the text lengths to prevent multiple calls.
         $text1Length = mb_strlen($text1);

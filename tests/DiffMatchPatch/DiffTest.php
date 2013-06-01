@@ -37,158 +37,6 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         $this->d = new Diff();
     }
 
-    public function testCommonPrefix()
-    {
-        // Detect any common prefix.
-        // Null case.
-        $this->assertEquals(0, $this->d->commonPrefix("abc", "xyz"));
-
-        // Non-null case.
-        $this->assertEquals(4, $this->d->commonPrefix("1234abcdef", "1234xyz"));
-
-        // Whole case.
-        $this->assertEquals(4, $this->d->commonPrefix("1234", "1234xyz"));
-    }
-
-    public function testCommonSuffix()
-    {
-        // Detect any common suffix.
-        // Null case.
-        $this->assertEquals(0, $this->d->commonSuffix("abc", "xyz"));
-
-        // Non-null case.
-        $this->assertEquals(4, $this->d->commonSuffix("abcdef1234", "xyz1234"));
-
-        // Whole case.
-        $this->assertEquals(4, $this->d->commonSuffix("1234", "xyz1234"));
-    }
-
-    public function testCommonOverlap()
-    {
-        # Null case.
-        $this->assertEquals(0, $this->d->commontOverlap("", "abcd"));
-
-        // Whole case.
-        $this->assertEquals(3, $this->d->commontOverlap("abc", "abcd"));
-
-        // No overlap.
-        $this->assertEquals(0, $this->d->commontOverlap("123456", "abcd"));
-
-        // Overlap.
-        $this->assertEquals(3, $this->d->commontOverlap("123456xxx", "xxxabcd"));
-
-        // Unicode.
-        // Some overly clever languages (C#) may treat ligatures as equal to their
-        // component letters.  E.g. U+FB01 == 'fi'
-        $this->assertEquals(0, $this->d->commontOverlap("fi", json_decode('"\ufb01"')));
-    }
-
-    public function testHalfMatch()
-    {
-        // Detect a halfmatch.
-        $this->d->setTimeout(1);
-
-        // No match.
-        $this->assertNull($this->d->halfMatch("1234567890", "abcdef"));
-        $this->assertNull($this->d->halfMatch("12345", "23"));
-
-        // Single Match.
-        $this->assertEquals(array("12", "90", "a", "z", "345678"), $this->d->halfMatch("1234567890", "a345678z"));
-        $this->assertEquals(array("a", "z", "12", "90", "345678"), $this->d->halfMatch("a345678z", "1234567890"));
-        $this->assertEquals(array("abc", "z", "1234", "0", "56789"), $this->d->halfMatch("abc56789z", "1234567890"));
-        $this->assertEquals(array("a", "xyz", "1", "7890", "23456"), $this->d->halfMatch("a23456xyz", "1234567890"));
-
-        // Multiple Matches.
-        $this->assertEquals(array("12123", "123121", "a", "z", "1234123451234"), $this->d->halfMatch("121231234123451234123121", "a1234123451234z"));
-        $this->assertEquals(array("", "-=-=-=-=-=", "x", "", "x-=-=-=-=-=-=-="), $this->d->halfMatch("x-=-=-=-=-=-=-=-=-=-=-=-=", "xx-=-=-=-=-=-=-="));
-        $this->assertEquals(array("-=-=-=-=-=", "", "", "y", "-=-=-=-=-=-=-=y"), $this->d->halfMatch("-=-=-=-=-=-=-=-=-=-=-=-=y", "-=-=-=-=-=-=-=yy"));
-
-
-        // Non-optimal halfmatch.
-        // Optimal diff would be -q+x=H-i+e=lloHe+Hu=llo-Hew+y not -qHillo+x=HelloHe-w+Hulloy
-        $this->assertEquals(array("qHillo", "w", "x", "Hulloy", "HelloHe"), $this->d->halfMatch("qHilloHelloHew", "xHelloHeHulloy"));
-
-        // Optimal no halfmatch.
-        $this->d->setTimeout(0);
-        $this->assertNull($this->d->halfMatch("qHilloHelloHew", "xHelloHeHulloy"));
-    }
-
-    public function testLinesToChars()
-    {
-        // Convert lines down to characters.
-        $this->assertEquals(
-            array("\x01\x02\x01", "\x02\x01\x02", array("", "alpha\n", "beta\n")),
-            $this->d->linesToChars("alpha\nbeta\nalpha\n", "beta\nalpha\nbeta\n")
-        );
-        $this->assertEquals(
-            array("", "\x01\x02\x03\x03", array("", "alpha\r\n", "beta\r\n", "\r\n")),
-            $this->d->linesToChars("", "alpha\r\nbeta\r\n\r\n\r\n")
-        );
-        $this->assertEquals(
-            array("\x01", "\x02", array("", "a", "b")),
-            $this->d->linesToChars("a", "b")
-        );
-
-        // More than 256 to reveal any 8-bit limitations.
-        $n = 300;
-        $lineList = array();
-        $charList = array();
-
-        for ($x = 1; $x <= $n; $x++) {
-            $lineList[] = $x . "\n";
-            $charList[] = Utils::unicodeChr($x);
-        }
-        $this->assertCount($n, $lineList);
-
-        $lines = implode('', $lineList);
-        $chars = implode('', $charList);
-        $this->assertEquals($n, mb_strlen($chars));
-
-        array_unshift($lineList, "");
-        $this->assertEquals(
-            array($chars, "", $lineList),
-            $this->d->linesToChars($lines, "")
-        );
-    }
-
-    public function testCharsToLines()
-    {
-        // Convert chars up to lines.
-        $diffs = array(
-            array(Diff::EQUAL, "\x01\x02\x01"),
-            array(Diff::INSERT, "\x02\x01\x02")
-        );
-        $this->d->charsToLines($diffs, array("", "alpha\n", "beta\n"));
-        $this->assertEquals(array(
-            array(Diff::EQUAL, "alpha\nbeta\nalpha\n"),
-            array(Diff::INSERT, "beta\nalpha\nbeta\n")
-        ), $diffs);
-
-        // More than 256 to reveal any 8-bit limitations.
-        $n = 300;
-        $lineList = array();
-        $charList = array();
-
-        for ($x = 1; $x <= $n; $x++) {
-            $lineList[] = $x . "\n";
-            $charList[] = Utils::unicodeChr($x);
-        }
-        $this->assertCount($n, $lineList);
-
-        $lines = implode('', $lineList);
-        $chars = implode('', $charList);
-        $this->assertEquals($n, mb_strlen($chars));
-
-        array_unshift($lineList, "");
-        $diffs = array(
-            array(Diff::DELETE, $chars)
-        );
-        $this->d->charsToLines($diffs, $lineList);
-        $this->assertEquals(array(
-            array(Diff::DELETE, $lines),
-        ), $diffs);
-    }
-
     public function testCleanupMerge()
     {
         // Cleanup a messy diff.
@@ -822,6 +670,9 @@ class DiffTest extends \PHPUnit_Framework_TestCase
 
     public function testBisect()
     {
+        $method = new \ReflectionMethod('DiffMatchPatch\Diff', 'bisect');
+        $method->setAccessible(true);
+
         // Since the resulting diff hasn't been normalized, it would be ok if
         // the insertion and deletion pairs are swapped.
         // If the order changes, tweak this test as required.
@@ -831,13 +682,13 @@ class DiffTest extends \PHPUnit_Framework_TestCase
             array(Diff::EQUAL, "a"),
             array(Diff::DELETE, "t"),
             array(Diff::INSERT, "p"),
-        ), $this->d->bisect('cat', 'map', PHP_INT_MAX));
+        ), $method->invoke($this->d, 'cat', 'map', PHP_INT_MAX));
 
         // Timeout.
         $this->assertEquals(array(
             array(Diff::DELETE, "cat"),
             array(Diff::INSERT, "map"),
-        ), $this->d->bisect('cat', 'map', 0));
+        ), $method->invoke($this->d, 'cat', 'map', 0));
 
     }
 
