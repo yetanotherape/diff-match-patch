@@ -173,15 +173,15 @@ class Patch
                 switch ($sign) {
                     case '+':
                         // Insertion.
-                        $patch->appendDiffs(array(Diff::INSERT, $text));
+                        $patch->appendChanges(array(Diff::INSERT, $text));
                         break;
                     case '-':
                         // Deletion.
-                        $patch->appendDiffs(array(Diff::DELETE, $text));
+                        $patch->appendChanges(array(Diff::DELETE, $text));
                         break;
                     case ' ':
                         // Minor equality.
-                        $patch->appendDiffs(array(Diff::EQUAL, $text));
+                        $patch->appendChanges(array(Diff::EQUAL, $text));
                         break;
                     case '@':
                         // Start of next patch.
@@ -251,12 +251,12 @@ class Patch
         // Add the prefix.
         $prefix = mb_substr($text, max(0, $patch->getStart2() - $padding), min($patch->getStart2(), $padding));
         if ($prefix != '') {
-            $patch->prependDiffs(array(Diff::EQUAL, $prefix));
+            $patch->prependChanges(array(Diff::EQUAL, $prefix));
         }
         // Add the prefix.
         $suffix = mb_substr($text, $patch->getStart2() + $patch->getLength1(), $padding);
         if ($suffix != '') {
-            $patch->appendDiffs(array(Diff::EQUAL, $suffix));
+            $patch->appendChanges(array(Diff::EQUAL, $suffix));
         }
 
         // Roll back the start points.
@@ -298,7 +298,8 @@ class Patch
             // Method 1: text1, text2
             // Compute diffs from text1 and text2.
             $text1 = $a;
-            $diffs = $diff->main($text1, $b);
+            $diff->main($text1, $b);
+            $diffs = $diff->getChanges();
             if (count($diffs) > 2) {
                 $diff->cleanupSemantic($diffs);
                 $diff->cleanupEfficiency($diffs);
@@ -307,7 +308,8 @@ class Patch
             // Method 2: diffs
             // Compute text1 from diffs.
             $diffs = $a;
-            $text1 = $diff->text1($diffs);
+            $diff->setChanges($diffs);
+            $text1 = $diff->text1();
         } elseif (is_string($a) && is_array($b) && is_null($c)) {
             // Method 3: text1, diffs
             $text1 = $a;
@@ -337,36 +339,36 @@ class Patch
             list($diffType, $diffText) = $diffs[$i];
             $diffTextLen = mb_strlen($diffText);
 
-            if (count($patch->getDiffs()) == 0 && $diffType != Diff::EQUAL) {
+            if (count($patch->getChanges()) == 0 && $diffType != Diff::EQUAL) {
                 // A new patch starts here.
                 $patch->setStart1($charCount1);
                 $patch->setStart2($charCount2);
             }
             if ($diffType == Diff::INSERT) {
                 // Insertion.
-                $patch->appendDiffs($diffs[$i]);
+                $patch->appendChanges($diffs[$i]);
                 $patch->setLength2($patch->getLength2() + $diffTextLen);
                 $postPatchText = mb_substr($postPatchText, 0, $charCount2) .
                     $diffText . mb_substr($postPatchText, $charCount2);
             } elseif ($diffType == Diff::DELETE) {
                 // Deletion.
-                $patch->appendDiffs($diffs[$i]);
+                $patch->appendChanges($diffs[$i]);
                 $patch->setLength1($patch->getLength1() + $diffTextLen);
                 $postPatchText = mb_substr($postPatchText, 0, $charCount2) .
                     mb_substr($postPatchText, $charCount2 + $diffTextLen);
             } elseif (
                 $diffType == Diff::EQUAL && $diffTextLen <= 2 * $this->getMargin() &&
-                count($patch->getDiffs()) && $i + 1 != count($diffs)
+                count($patch->getChanges()) && $i + 1 != count($diffs)
             ) {
                 // Small equality inside a patch.
-                $patch->appendDiffs($diffs[$i]);
+                $patch->appendChanges($diffs[$i]);
                 $patch->setLength1($patch->getLength1() + $diffTextLen);
                 $patch->setLength2($patch->getLength2() + $diffTextLen);
             }
 
             if ($diffType == Diff::EQUAL && $diffTextLen >= 2 * $this->getMargin()) {
                 // Time for a new patch.
-                if (count($patch->getDiffs())) {
+                if (count($patch->getChanges())) {
                     $this->addContext($patch, $prePatchText);
                     $patches[] = $patch;
                     $patch = new PatchObject();
@@ -389,7 +391,7 @@ class Patch
         }
 
         // Pick up the leftover patch if not empty.
-        if (count($patch->getDiffs())) {
+        if (count($patch->getChanges())) {
             $this->addContext($patch, $prePatchText);
             $patches[] = $patch;
         }
@@ -426,7 +428,7 @@ class Patch
             $start1 = $bigPatch->getStart1();
             $start2 = $bigPatch->getStart2();
             $preContext = '';
-            $bigPatchDiffs = $bigPatch->getDiffs();
+            $bigPatchDiffs = $bigPatch->getChanges();
             while (count($bigPatchDiffs)) {
                 // Create one of several smaller patches.
                 $empty = true;
@@ -438,7 +440,7 @@ class Patch
                 if ($preContext != '') {
                     $patch->setLength1($preContextLen);
                     $patch->setLength2($preContextLen);
-                    $patch->appendDiffs(array(Diff::EQUAL, $preContext));
+                    $patch->appendChanges(array(Diff::EQUAL, $preContext));
                 }
 
                 while (count($bigPatchDiffs) && $patch->getLength1() < $patchSize - $this->getMargin()) {
@@ -449,10 +451,10 @@ class Patch
                         // Insertions are harmless.
                         $patch->setLength2($patch->getLength2() + $diffTextLen);
                         $start2 += $diffTextLen;
-                        $patch->appendDiffs(array_shift($bigPatchDiffs));
+                        $patch->appendChanges(array_shift($bigPatchDiffs));
                         $empty = false;
                     } elseif (
-                        $diffType == Diff::DELETE && ($patchDiffs = $patch->getDiffs()) &&
+                        $diffType == Diff::DELETE && ($patchDiffs = $patch->getChanges()) &&
                         count($patchDiffs) == 1 && $patchDiffs[0][0] == Diff::EQUAL &&
                         2 * $patchSize < $diffTextLen
                     ) {
@@ -460,7 +462,7 @@ class Patch
                         $patch->setLength1($patch->getLength1() + $diffTextLen);
                         $start1 += $diffTextLen;
                         array_shift($bigPatchDiffs);
-                        $patch->appendDiffs(array($diffType, $diffText));
+                        $patch->appendChanges(array($diffType, $diffText));
                         $empty = false;
                     } else {
                         // Deletion or equality.  Only take as much as we can stomach.
@@ -481,29 +483,31 @@ class Patch
                         } else {
                             $bigPatchDiffs[0][1] = mb_substr($bigPatchDiffs[0][1], $diffTextLen);
                         }
-                        $patch->appendDiffs(array($diffType, $diffText));
+                        $patch->appendChanges(array($diffType, $diffText));
                     }
                 }
 
                 // Compute the head context for the next patch.
                 $diff = $this->getDiff();
-                $preContext = $diff->text2($patch->getDiffs());
+                $diff->setChanges($patch->getChanges());
+                $preContext = $diff->text2();
                 $preContext = mb_substr($preContext, -$this->getMargin());
 
                 // Append the end context for this patch.
-                $postContext = $diff->text1($bigPatchDiffs);
+                $diff->setChanges($bigPatchDiffs);
+                $postContext = $diff->text1();
                 $postContext = mb_substr($postContext, 0, $this->getMargin());
                 if ($postContext != '') {
                     $patch->setLength1($patch->getLength1() + mb_strlen($postContext));
                     $patch->setLength2($patch->getLength2() + mb_strlen($postContext));
                     if (
-                        ($patchDiffs = $patch->getDiffs()) && count($patchDiffs) &&
+                        ($patchDiffs = $patch->getChanges()) && count($patchDiffs) &&
                         $patchDiffs[count($patchDiffs) - 1][0] == Diff::EQUAL
                     ) {
                         $patchDiffs[count($patchDiffs) - 1][1] .= $postContext;
-                        $patch->setDiffs($patchDiffs);
+                        $patch->setChanges($patchDiffs);
                     } else {
-                        $patch->appendDiffs(array(Diff::EQUAL, $postContext));
+                        $patch->appendChanges(array(Diff::EQUAL, $postContext));
                     }
                 }
 
@@ -541,7 +545,7 @@ class Patch
 
         // Add some padding on start of first diff.
         $patch = &$patches[0];
-        $diffs = $patch->getDiffs();
+        $diffs = $patch->getChanges();
         $firstChange = &$diffs[0];
         if (!$diffs || $firstChange[0] != Diff::EQUAL) {
             // Add nullPadding equality.
@@ -561,12 +565,12 @@ class Patch
             $patch->setLength1($patch->getLength1() + $extraLength);
             $patch->setLength2($patch->getLength2() + $extraLength);
         }
-        $patch->setDiffs($diffs);
+        $patch->setChanges($diffs);
         unset($patch, $firstChange);
 
         // Add some padding on end of last diff.
         $patch = &$patches[count($patches) - 1];
-        $diffs = $patch->getDiffs();
+        $diffs = $patch->getChanges();
         $lastChange = &$diffs[count($diffs) - 1];
         if (!$diffs || $lastChange[0] != Diff::EQUAL) {
             // Add nullPadding equality.
@@ -580,7 +584,7 @@ class Patch
             $patch->setLength1($patch->getLength1() + $extraLength);
             $patch->setLength2($patch->getLength2() + $extraLength);
         }
-        $patch->setDiffs($diffs);
+        $patch->setChanges($diffs);
         unset($patch, $lastChange);
 
         return $nullPadding;
@@ -620,7 +624,8 @@ class Patch
 
         foreach ($patches as $patch) {
             $expectedLoc = $patch->getStart2() + $delta;
-            $text1 = $diff->text1($patch->getDiffs());
+            $diff->setChanges($patch->getChanges());
+            $text1 = $diff->text1();
             $text1Len = mb_strlen($text1);
             $endLoc = -1;
 
@@ -657,31 +662,31 @@ class Patch
                 }
                 if ($text1 == $text2) {
                     // Perfect match, just shove the replacement text in.
-                    $text = mb_substr($text, 0, $startLoc) . $diff->text2($patch->getDiffs()) .
+                    $text = mb_substr($text, 0, $startLoc) . $diff->text2() .
                         mb_substr($text, $startLoc + $text1Len);
                 } else {
                     // Imperfect match.
                     // Run a diff to get a framework of equivalent indices.
-                    $diffs = $diff->main($text1, $text2, false);
+                    $diff->main($text1, $text2, false);
                     if (
                         $text1Len > $maxBits &&
-                        $diff->levenshtein($diffs) / $text1Len > $this->getDeleteTreshold()
+                        $diff->levenshtein() / $text1Len > $this->getDeleteTreshold()
                     ) {
                         // The end points match, but the content is unacceptably bad.
                         $results[count($results) - 1] = false;
                     } else {
-                        $diff->cleanupSemanticLossless($diffs);
+                        $diff->cleanupSemanticLossless();
                         $index1 = 0;
-                        foreach ($patch->getDiffs() as $change) {
+                        foreach ($patch->getChanges() as $change) {
                             list ($op, $data) = $change;
                             if ($op != Diff::EQUAL) {
-                                $index2 = $diff->xIndex($diffs, $index1);
+                                $index2 = $diff->xIndex($index1);
                                 if ($op == Diff::INSERT) {
                                     $text = mb_substr($text, 0, $startLoc + $index2) . $data .
                                         mb_substr($text, $startLoc + $index2);
                                 } elseif ($op == Diff::DELETE) {
                                     $text = mb_substr($text, 0, $startLoc + $index2) .
-                                        mb_substr($text, $startLoc + $diff->xIndex($diffs, $index1 + mb_strlen($data)));
+                                        mb_substr($text, $startLoc + $diff->xIndex($index1 + mb_strlen($data)));
                                 }
                             }
                             if ($op != Diff::DELETE) {

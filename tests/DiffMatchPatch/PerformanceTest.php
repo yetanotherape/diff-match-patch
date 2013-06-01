@@ -52,8 +52,8 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $timeElapsed = microtime(1) - $timeStart;
         $memoryUsage = (memory_get_peak_usage() - $memoryStart) / 1024 / 1024;
 
-        $this->assertLessThan(0.8, $timeElapsed);
-        $this->assertLessThan(2, $memoryUsage);
+        $this->assertLessThan(0.6, $timeElapsed);
+        $this->assertLessThan(1, $memoryUsage);
 
         echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
         echo 'Memory usage: ' . round($memoryUsage, 3) . PHP_EOL;
@@ -69,6 +69,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
         $diff = new Diff();
         $diff->setTimeout(0);
         $diff->main($text1, $text2);
+        unset($diff);
 
         $timeStart = microtime(1);
         $memoryStart = memory_get_usage();
@@ -77,6 +78,7 @@ class PerformanceTest extends \PHPUnit_Framework_TestCase
             $diff = new Diff();
             $diff->setTimeout(0);
             $diff->main($text1, $text2);
+            unset($diff);
         }
 
         $timeElapsed = microtime(1) - $timeStart;

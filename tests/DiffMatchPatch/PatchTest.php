@@ -56,7 +56,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
         $p->setStart2(21);
         $p->setLength1(18);
         $p->setLength2(17);
-        $p->setDiffs(array(
+        $p->setChanges(array(
            array(Diff::EQUAL, "jump"),
            array(Diff::DELETE, "s"),
            array(Diff::INSERT, "ed"),
@@ -161,7 +161,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->p->toText($patches));
 
         // Diff input.
-        $diffs = $this->d->main($text1, $text2, false);
+        $diffs = $this->d->main($text1, $text2, false)->getChanges();
         $patches = $this->p->make($diffs);
         $this->assertEquals($expected, $this->p->toText($patches));
 
@@ -186,7 +186,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
             array(Diff::INSERT, "~!@#$%^&*()_+{}|:\"<>?"),
         );
         $patches = $this->p->fromText("@@ -1,21 +1,21 @@\n-%601234567890-=%5B%5D%5C;',./\n+~!@#$%25%5E&*()_+%7B%7D%7C:%22%3C%3E?\n");
-        $this->assertEquals($diffs, reset($patches)->getDiffs());
+        $this->assertEquals($diffs, $patches[0]->getChanges());
 
         // Long string with repeats.
         $text1 = "";

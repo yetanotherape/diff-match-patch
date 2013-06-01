@@ -32,8 +32,9 @@ class PatchObject
 {
     /**
      * @var array
+     * TODO replace to diff object
      */
-    protected $diffs = array();
+    protected $changes = array();
     /**
      * @var int
      */
@@ -78,7 +79,7 @@ class PatchObject
         $patchText = "@@ -" . $coords1 . " +" . $coords2 . " @@\n";
 
         // Escape the body of the patch with %xx notation.
-        foreach ($this->getDiffs() as $change) {
+        foreach ($this->getChanges() as $change) {
             $op = $change[0];
             $text = $change[1];
 
@@ -167,33 +168,33 @@ class PatchObject
     /**
      * @return array
      */
-    public function getDiffs()
+    public function getChanges()
     {
-        return $this->diffs;
+        return $this->changes;
     }
 
     /**
-     * @param $diffs
+     * @param $changes
      */
-    public function setDiffs($diffs)
+    public function setChanges($changes)
     {
-        $this->diffs = $diffs;
+        $this->changes = $changes;
     }
 
     /**
-     * @param array $diff
+     * @param array $change
      */
-    public function appendDiffs(array $diff)
+    public function appendChanges(array $change)
     {
-        $this->diffs[] = $diff;
+        $this->changes[] = $change;
     }
 
     /**
-     * @param array $diff
+     * @param array $change
      */
-    public function prependDiffs(array $diff)
+    public function prependChanges(array $change)
     {
-        array_unshift($this->diffs, $diff);
+        array_unshift($this->changes, $change);
     }
 
 }

@@ -170,12 +170,13 @@ class Diff
     /**
      * Reorder and merge like edit sections.  Merge equalities.
      * Any edit section can move as long as it doesn't cross an equality.
-     * Modifies $diffs. TODO try to fix it!
      *
-     * @param array $diffs Array of diff arrays.
+     * @return $this
      */
-    public function cleanupMerge(&$diffs)
+    public function cleanupMerge()
     {
+        $diffs = $this->getChanges();
+
         $diffs[] = array(
             self::EQUAL,
             '',
@@ -296,23 +297,27 @@ class Diff
             }
             $pointer++;
         }
+        $this->setChanges($diffs);
 
         // If shifts were made, the diff needs reordering and another shift sweep.
         if ($changes) {
-            $this->cleanupMerge($diffs);
+            $this->cleanupMerge();
         }
+
+        return $this;
     }
 
     /**
      * Look for single edits surrounded on both sides by equalities
      * which can be shifted sideways to align the edit to a word boundary.
      * e.g: The c<ins>at c</ins>ame. -> The <ins>cat </ins>came.
-     * Modifies $diffs. TODO try to fix it!
      *
-     * @param array $diffs Array of diff arrays.
+     * @return $this
      */
-    public function cleanupSemanticLossless(&$diffs)
+    public function cleanupSemanticLossless()
     {
+        $diffs = $this->getChanges();
+
         $pointer = 1;
         // Intentionally ignore the first and last element (don't need checking).
         while ($pointer < count($diffs) - 1) {
@@ -368,6 +373,9 @@ class Diff
             }
             $pointer++;
         }
+        $this->setChanges($diffs);
+
+        return $this;
     }
 
     /**
@@ -424,13 +432,14 @@ class Diff
 
     /**
      * Reduce the number of edits by eliminating semantically trivial equalities.
-     * Modifies $diffs. TODO try to fix it!
      * TODO refactor this cap's code
      *
-     * @param array $diffs Array of diff arrays.
+     * @return $this
      */
-    public function cleanupSemantic(&$diffs)
+    public function cleanupSemantic()
     {
+        $diffs = $this->getChanges();
+
         $changes = false;
         // Stack of indices where equalities are found.
         $equalities = array();
@@ -493,11 +502,15 @@ class Diff
             }
             $pointer++;
         }
+        $this->setChanges($diffs);
+
         // Normalize the diff.
         if ($changes) {
-            $this->cleanupMerge($diffs);
+            $this->cleanupMerge();
         }
-        $this->cleanupSemanticLossless($diffs);
+        $this->cleanupSemanticLossless();
+
+        $diffs = $this->getChanges();
 
         // Find any overlaps between deletions and insertions.
         // e.g: <del>abcxxx</del><ins>xxxdef</ins>
@@ -548,16 +561,20 @@ class Diff
             }
             $pointer++;
         }
+        $this->setChanges($diffs);
+
+        return $this;
     }
 
     /**
      * Reduce the number of edits by eliminating operationally trivial equalities.
-     * Modifies $diffs. TODO try to fix it!
      * TODO refactor this Cap's code
      *
-     * @param array $diffs Array of diff arrays.
+     * @return $this
      */
-    public function cleanupEfficiency(&$diffs) {
+    public function cleanupEfficiency() {
+        $diffs = $this->getChanges();
+
         $changes = false;
         // Stack of indices where equalities are found.
         $equalities = array();
@@ -649,20 +666,24 @@ class Diff
             }
             $pointer++;
         }
+        $this->setChanges($diffs);
+
         if ($changes) {
-            $this->cleanupMerge($diffs);
+            $this->cleanupMerge();
         }
+
+        return $this;
     }
 
     /**
      * Convert a diff array into a pretty HTML report.
      *
-     * @param array $diffs Array of diff arrays.
-     *
      * @return string HTML representation.
      */
-    public function prettyHtml($diffs)
+    public function prettyHtml()
     {
+        $diffs = $this->getChanges();
+
         $html = '';
         foreach ($diffs as $change) {
             $op = $change[0];
@@ -688,11 +709,12 @@ class Diff
     /**
      * Compute and return the source text (all equalities and deletions).
      *
-     * @param array $diffs Array of diff arrays.
-     *
      * @return string Source text.
      */
-    public function text1($diffs){
+    public function text1()
+    {
+        $diffs = $this->getChanges();
+
         $text = '';
         foreach ($diffs as $change) {
             $op = $change[0];
@@ -709,11 +731,12 @@ class Diff
     /**
      * Compute and return the destination text (all equalities and insertions).
      *
-     * @param array $diffs Array of diff arrays.
-     *
      * @return string Destination text.
      */
-    public function text2($diffs){
+    public function text2()
+    {
+        $diffs = $this->getChanges();
+
         $text = '';
         foreach ($diffs as $change) {
             $op = $change[0];
@@ -733,11 +756,11 @@ class Diff
      * E.g. =3\t-2\t+ing  -> Keep 3 chars, delete 2 chars, insert 'ing'.
      * Operations are tab-separated.  Inserted text is escaped using %xx notation.
      *
-     * @param array $diffs Array of diff arrays.
-     *
      * @return string Delta text.
      */
-    public function toDelta($diffs) {
+    public function toDelta() {
+        $diffs = $this->getChanges();
+
         $text = array();
         foreach ($diffs as $change) {
             $op = $change[0];
@@ -763,7 +786,7 @@ class Diff
      * @param string $delta Delta text.
      *
      * @throws \InvalidArgumentException If invalid input. TODO create exception class
-     * @return array Array of diff arrays.
+     * @return $this.
      */
     public function fromDelta($text1, $delta)
     {
@@ -811,21 +834,23 @@ class Diff
         if ($pointer != mb_strlen($text1)) {
             throw new \InvalidArgumentException('Delta length (' . $pointer . ') does not equal source text length (' . mb_strlen($text1) . ').');
         }
+        $this->setChanges($diffs);
 
-        return $diffs;
+        return $this;
     }
 
     /**
      * Compute and return location in text2 equivalent to the $loc in text1.
      * e.g. "The cat" vs "The big cat", 1->1, 5->8
      *
-     * @param array $diffs Array of diff arrays.
      * @param int $loc Location within text1.
      *
      * @return int Location within text2.
      */
-    public function xIndex($diffs, $loc)
+    public function xIndex($loc)
     {
+        $diffs = $this->getChanges();
+
         $chars1 = 0;
         $chars2 = 0;
         $last_chars1 = 0;
@@ -862,11 +887,12 @@ class Diff
     /**
      * Compute the Levenshtein distance; the number of inserted, deleted or substituted characters.
      *
-     * @param array $diffs Array of diff arrays.
-     *
      * @return int Number of changes.
      */
-    public function levenshtein($diffs){
+    public function levenshtein()
+    {
+        $diffs = $this->getChanges();
+
         $levenshtein = 0;
         $insertions = 0;
         $deletions = 0;
@@ -908,7 +934,7 @@ class Diff
      *                           Users should set $this->timeout instead.
      *
      * @throws \InvalidArgumentException If texts is null. TODO create exception class
-     * @return array Array of changes.
+     * @return self
      */
     public function main($text1, $text2, $checklines = true, $deadline = null)
     {
@@ -928,11 +954,12 @@ class Diff
         // Check for equality (speedup).
         if ($text1 == $text2) {
             if ($text1 != '') {
-                return array(
+                $this->setChanges(array(
                     array(self::EQUAL, $text1),
-                );
+                ));
+                return $this;
             }
-            return array();
+            return $this;
         }
 
         // Trim off common prefix (speedup).
@@ -966,9 +993,11 @@ class Diff
             array_push($diffs, array(self::EQUAL, $commonSuffix));
         }
 
-        $this->cleanupMerge($diffs);
+        $this->setChanges($diffs);
 
-        return $diffs;
+        $this->cleanupMerge();
+
+        return $this;
     }
 
     /**
@@ -1042,15 +1071,17 @@ class Diff
                 // A half-match was found, sort out the return data.
                 list($text1_a, $text1_b, $text2_a, $text2_b, $mid_common) = $hm;
                 // Send both pairs off for separate processing.
-                $diffs_a = $this->main($text1_a, $text2_a, $checklines, $deadline);
-                $diffs_b = $this->main($text1_b, $text2_b, $checklines, $deadline);
+                $diffA = new Diff();
+                $diffA->main($text1_a, $text2_a, $checklines, $deadline);
+                $diffB = new Diff();
+                $diffB->main($text1_b, $text2_b, $checklines, $deadline);
                 // Merge the results.
                 $diffs = array_merge(
-                    $diffs_a,
+                    $diffA->getChanges(),
                     array(
                         array(self::EQUAL, $mid_common),
                     ),
-                    $diffs_b
+                    $diffB->getChanges()
                 );
                 return $diffs;
             }
@@ -1078,7 +1109,9 @@ class Diff
         // Scan the text on a line-by-line basis first.
         list($text1, $text2, $lineArray) = $this->getToolkit()->linesToChars($text1, $text2);
 
-        $diffs = $this->main($text1, $text2, false, $deadline);
+        $diff = new Diff();
+        $diff->main($text1, $text2, false, $deadline);
+        $diffs = $diff->getChanges();
 
         // Convert the diff back to original text.
         $this->getToolkit()->charsToLines($diffs, $lineArray);
@@ -1109,9 +1142,10 @@ class Diff
                     // Upon reaching an equality, check for prior redundancies.
                     if ($countDelete > 0 && $countInsert > 0) {
                         // Delete the offending records and add the merged ones.
-                        $a = $this->main($textDelete, $textInsert, false, $deadline);
-                        array_splice($diffs, $pointer - $countDelete - $countInsert, $countDelete + $countInsert, $a);
-                        $pointer = $pointer - $countDelete - $countInsert + count($a);
+                        $subDiff = new Diff();
+                        $subDiff->main($textDelete, $textInsert, false, $deadline);
+                        array_splice($diffs, $pointer - $countDelete - $countInsert, $countDelete + $countInsert, $subDiff->getChanges());
+                        $pointer = $pointer - $countDelete - $countInsert + count($subDiff->getChanges());
                     }
                     $countDelete = 0;
                     $countInsert = 0;
@@ -1263,9 +1297,11 @@ class Diff
         $text2B = mb_substr($text2, $y);
 
         // Compute both diffs serially.
-        $diffsA = $this->main($text1A, $text2A, false, $deadline);
-        $diffsB = $this->main($text1B, $text2B, false, $deadline);
+        $diffA = new Diff();
+        $diffA->main($text1A, $text2A, false, $deadline);
+        $diffB = new Diff();
+        $diffB->main($text1B, $text2B, false, $deadline);
 
-        return array_merge($diffsA, $diffsB);
+        return array_merge($diffA->getChanges(), $diffB->getChanges());
     }
 }

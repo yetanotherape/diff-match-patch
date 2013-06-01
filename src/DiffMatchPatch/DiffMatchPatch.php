@@ -173,7 +173,7 @@ class DiffMatchPatch
      */
     public function diff_main($text1, $text2, $checklines = true)
     {
-        return $this->diff->main($text1, $text2, $checklines);
+        return $this->diff->main($text1, $text2, $checklines)->getChanges();
     }
 
     /**
@@ -184,7 +184,9 @@ class DiffMatchPatch
      */
     public function diff_cleanupSemantic(&$diffs)
     {
-        $this->diff->cleanupSemantic($diffs);
+        $this->diff->setChanges($diffs);
+        $this->diff->cleanupSemantic();
+        $diffs = $this->diff->getChanges();
     }
 
     /**
@@ -195,7 +197,9 @@ class DiffMatchPatch
      */
     public function diff_cleanupEfficiency(&$diffs)
     {
-        $this->diff->cleanupEfficiency($diffs);
+        $this->diff->setChanges($diffs);
+        $this->diff->cleanupEfficiency();
+        $diffs = $this->diff->getChanges();
     }
 
     /**
@@ -207,7 +211,8 @@ class DiffMatchPatch
      */
     public function diff_levenshtein($diffs)
     {
-        return $this->diff->levenshtein($diffs);
+        $this->diff->setChanges($diffs);
+        return $this->diff->levenshtein();
     }
 
     /**
@@ -219,7 +224,8 @@ class DiffMatchPatch
      */
     public function diff_prettyHtml($diffs)
     {
-        return $this->diff->prettyHtml($diffs);
+        $this->diff->setChanges($diffs);
+        return $this->diff->prettyHtml();
     }
 
     /**
