@@ -52,7 +52,7 @@ class Diff
      */
     protected $editCost = 4;
     /**
-     * @var Change[]
+     * @var array
      */
     protected $changes = array();
     /**
@@ -120,7 +120,7 @@ class Diff
     }
 
     /**
-     * @return Change[]
+     * @return array
      */
     public function getChanges()
     {
@@ -128,7 +128,7 @@ class Diff
     }
 
     /**
-     * @param \DiffMatchPatch\Change[] $changes
+     * @param array $changes
      *
      * @return $this
      */
