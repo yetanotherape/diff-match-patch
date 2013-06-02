@@ -29,7 +29,7 @@ namespace DiffMatchPatch;
 class PerformanceTest extends \PHPUnit_Framework_TestCase
 {
     protected  function setUp() {
-
+        mb_internal_encoding('UTF-8');
     }
 
     public function testDiffMainPerformance()

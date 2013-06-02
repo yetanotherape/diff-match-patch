@@ -34,6 +34,8 @@ class MatchTest extends \PHPUnit_Framework_TestCase
     protected $m;
 
     protected  function setUp() {
+        mb_internal_encoding('UTF-8');
+
         $this->m = new Match();
     }
 

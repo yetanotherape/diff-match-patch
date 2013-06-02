@@ -299,11 +299,11 @@ class Patch
             // Compute diffs from text1 and text2.
             $text1 = $a;
             $diff->main($text1, $b);
-            $diffs = $diff->getChanges();
-            if (count($diffs) > 2) {
-                $diff->cleanupSemantic($diffs);
-                $diff->cleanupEfficiency($diffs);
+            if (count($diff->getChanges()) > 2) {
+                $diff->cleanupSemantic();
+                $diff->cleanupEfficiency();
             }
+            $diffs = $diff->getChanges();
         } elseif (is_array($a) && is_null($b)) {
             // Method 2: diffs
             // Compute text1 from diffs.

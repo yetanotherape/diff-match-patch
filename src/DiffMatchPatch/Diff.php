@@ -70,9 +70,6 @@ class Diff
      */
     public function __construct($text1 = null, $text2 = null)
     {
-        // FIXME This may cause some side effects.
-        mb_internal_encoding('UTF-8');
-
         $this->toolkit = new DiffToolkit();
 
         if (isset($text1, $text2)) {
@@ -962,6 +959,13 @@ class Diff
             return $this;
         }
 
+        $prevInternalEncoding = mb_internal_encoding();
+        if ($prevInternalEncoding != 'UCS-2LE') {
+            mb_internal_encoding('UCS-2LE');
+            $text1 = iconv($prevInternalEncoding, 'UCS-2LE', $text1);
+            $text2 = iconv($prevInternalEncoding, 'UCS-2LE', $text2);
+        }
+
         // Trim off common prefix (speedup).
         $commonLength = $this->getToolkit()->commonPrefix($text1, $text2);
         if ($commonLength == 0) {
@@ -991,6 +995,14 @@ class Diff
         }
         if ($commonSuffix != '') {
             array_push($diffs, array(self::EQUAL, $commonSuffix));
+        }
+
+        if ($prevInternalEncoding != 'UCS-2LE') {
+            mb_internal_encoding($prevInternalEncoding);
+            foreach ($diffs as &$change) {
+                $change[1] = iconv('UCS-2LE', $prevInternalEncoding, $change[1]);
+            }
+            unset($change);
         }
 
         $this->setChanges($diffs);
@@ -1115,9 +1127,11 @@ class Diff
 
         // Convert the diff back to original text.
         $this->getToolkit()->charsToLines($diffs, $lineArray);
+        $diff->setChanges($diffs);
 
         // Eliminate freak matches (e.g. blank lines)
-        $this->cleanupSemantic($diffs);
+        $diff->cleanupSemantic();
+        $diffs = $diff->getChanges();
 
         // Rediff any replacement blocks, this time character-by-character.
         // Add a dummy entry at the end.

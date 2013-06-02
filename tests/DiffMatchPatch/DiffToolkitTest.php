@@ -34,6 +34,8 @@ class DiffToolkitTest extends \PHPUnit_Framework_TestCase
     protected $dt;
 
     protected  function setUp() {
+        mb_internal_encoding('UTF-8');
+
         $this->dt = new DiffToolkit();
     }
 

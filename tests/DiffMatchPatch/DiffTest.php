@@ -34,6 +34,8 @@ class DiffTest extends \PHPUnit_Framework_TestCase
     protected $d;
 
     protected  function setUp() {
+        mb_internal_encoding('UTF-8');
+
         $this->d = new Diff();
     }
 

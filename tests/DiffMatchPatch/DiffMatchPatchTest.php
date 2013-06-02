@@ -37,6 +37,8 @@ class DiffMatchPatchTest extends \PHPUnit_Framework_TestCase
     protected $dmp;
 
     protected  function setUp() {
+        mb_internal_encoding('UTF-8');
+
         $this->dmp = new DiffMatchPatch();
     }
 

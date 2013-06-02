@@ -287,14 +287,16 @@ class DiffToolkit {
         // Simple string concat is even faster than implode() in PHP.
         $chars = '';
 
+        $delimiter = iconv('UTF-8', mb_internal_encoding(), "\n");
+
         // TODO optimize code
         // explode('\n', $text) would temporarily double our memory footprint,
         // but mb_strpos() and mb_substr() work slow
-        $lines = explode("\n", $text);
+        $lines = explode($delimiter, $text);
         foreach ($lines as $i => $line) {
             if (mb_strlen($line)) {
                 if (isset($lines[$i + 1])) {
-                    $line .= "\n";
+                    $line .= $delimiter;
                 }
                 if (isset($lineHash[$line])) {
                     $chars .= Utils::unicodeChr($lineHash[$line]);
@@ -343,7 +345,8 @@ class DiffToolkit {
     {
         foreach ($diffs as &$diff) {
             $text = '';
-            foreach (preg_split("//u", $diff[1], -1, PREG_SPLIT_NO_EMPTY) as $char) {
+            for ($i = 0; $i < mb_strlen($diff[1]); $i++) {
+                $char = mb_substr($diff[1], $i, 1);
                 $text .= $lineArray[Utils::unicodeOrd($char)];
             }
             $diff[1] = $text;

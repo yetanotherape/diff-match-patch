@@ -34,24 +34,30 @@ class Utils {
      *
      * @param int $code Character code.
      *
-     * @return string Char with given code in UTF-8.
+     * @return string Char with given code
      */
     public static function unicodeChr($code) {
         // TODO this works by order of magnitude slower then chr()
         $code = sprintf("%04x", $code);
-        return json_decode('"\u'.$code.'"');
+        $char = json_decode('"\u'.$code.'"');
+        $char = iconv('UTF-8', mb_internal_encoding(), $char);
+
+        return $char;
     }
 
     /**
      * Multibyte replacement for standard ord()
      *
-     * @param string $char Char in UTF-8
+     * @param string $char Char.
      *
      * @return int Code of given char.
      */
     public static function unicodeOrd($char) {
-        $twoByteChar = iconv('UTF-8', 'UCS-2LE', $char);
-        $code = ord($twoByteChar[0]) + 256 * ord($twoByteChar[1]);
+        if (mb_internal_encoding() != 'UCS-2LE') {
+            $char = iconv(mb_internal_encoding(), 'UCS-2LE', $char);
+        }
+        $code = ord($char[0]) + 256 * ord($char[1]);
+
         return $code;
     }
 

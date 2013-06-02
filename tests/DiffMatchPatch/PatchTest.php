@@ -42,6 +42,8 @@ class PatchTest extends \PHPUnit_Framework_TestCase
     protected $m;
 
     protected  function setUp() {
+        mb_internal_encoding('UTF-8');
+
         $this->d = new Diff();
         $this->m = new Match();
         // Assumes that Match->maxBits is 32.

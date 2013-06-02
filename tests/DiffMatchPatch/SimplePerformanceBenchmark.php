@@ -21,10 +21,11 @@
 
 require __DIR__ . "/../../src/DiffMatchPatch/Diff.php";
 require __DIR__ . "/../../src/DiffMatchPatch/DiffToolkit.php";
+require __DIR__ . "/../../src/DiffMatchPatch/Utils.php";
 
 use DiffMatchPatch\Diff;
 
-$size = 'S';
+$size = 'M';
 $text1 = file_get_contents(__DIR__ . "/fixtures/{$size}_performance1.txt");
 $text2 = file_get_contents(__DIR__ .  "/fixtures/{$size}_performance2.txt");
 
@@ -35,11 +36,24 @@ $timeStart = microtime(1);
 
 $diff = new Diff();
 $diff->setTimeout(0);
-$diff->main($text1, $text2, false);
+$diff->main($text1, $text2, false)->cleanupSemantic();
 
 $timeElapsed = microtime(1) - $timeStart;
 
 echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
 echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL;
 echo 'Texts length: ' . mb_strlen($text1) . ', ' . mb_strlen($text2) . PHP_EOL;
-echo 'Diffs count: ' . count($diff->getChanges()) . PHP_EOL;
+echo 'Diffs count: ' . count($diff->getChanges()) . PHP_EOL . PHP_EOL;
+
+$timeStart = microtime(1);
+
+$diff = new Diff();
+$diff->setTimeout(0);
+$diff->main($text1, $text2)->cleanupEfficiency();
+
+$timeElapsed = microtime(1) - $timeStart;
+
+echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
+echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL;
+echo 'Texts length: ' . mb_strlen($text1) . ', ' . mb_strlen($text2) . PHP_EOL;
+echo 'Diffs count: ' . count($diff->getChanges()) . PHP_EOL . PHP_EOL;
