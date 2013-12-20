@@ -16,10 +16,15 @@ Compare two plain text and efficiently return a array of differences. It works w
 
 Usage:
 ```php
+<?php
+
+use DiffMatchPatch\DiffMatchPatch;
+
 $text1 = "The quick brown fox jumps over the lazy dog.";
 $text2 = "That quick brown fox jumped over a lazy dog.";
 $dmp = new DiffMatchPatch();
 $diffs = $dmp->diff_main($text1, $text2, false);
+var_dump($diffs);
 ```
 Returns:
 ```php
@@ -45,6 +50,10 @@ Given a search string, find its best fuzzy match in a plain text near the given 
 
 Usage:
 ```php
+<?php
+
+use DiffMatchPatch\DiffMatchPatch;
+
 $dmp = new DiffMatchPatch();
 $text = "The quick brown fox jumps over the lazy fox.";
 $pos = $dmp->match_main($text, "fox", 0); // Returns 16
@@ -63,6 +72,10 @@ Apply a list of patches in [Unidiff-like format](https://code.google.com/p/googl
 
 Usage:
 ```php
+<?php
+
+use DiffMatchPatch\DiffMatchPatch;
+
 $dmp = new DiffMatchPatch();
 $patches = $dmp->patch_make("The quick brown fox jumps over the lazy dog.", "That quick brown fox jumped over a lazy dog.");
 // @@ -1,11 +1,12 @@
@@ -79,6 +92,7 @@ $patches = $dmp->patch_make("The quick brown fox jumps over the lazy dog.", "Tha
 // +a
 //   laz
 $result = $dmp->patch_apply($patches, "The quick red rabbit jumps over the tired tiger.");
+var_dump($diffs);
 ```
 Returns:
 ```php
