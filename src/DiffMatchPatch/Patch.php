@@ -253,7 +253,7 @@ class Patch
         if ($prefix != '') {
             $patch->prependChanges(array(Diff::EQUAL, $prefix));
         }
-        // Add the prefix.
+        // Add the suffix.
         $suffix = mb_substr($text, $patch->getStart2() + $patch->getLength1(), $padding);
         if ($suffix != '') {
             $patch->appendChanges(array(Diff::EQUAL, $suffix));
