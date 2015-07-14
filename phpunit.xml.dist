@@ -7,13 +7,13 @@
 >
     <testsuites>
         <testsuite name="DiffMatchPatch Test Suite">
-            <directory suffix="Test.php">tests/DiffMatchPatch/</directory>
+            <directory suffix="Test.php">tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory suffix=".php">src/DiffMatchPatch/</directory>
+            <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
 </phpunit>
