@@ -22,7 +22,7 @@
         "lib-iconv": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "5.*"
+        "phpunit/phpunit": "4.*"
     },
     "autoload": {
         "psr-4": {
