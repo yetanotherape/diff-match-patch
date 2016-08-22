@@ -92,7 +92,7 @@ $patches = $dmp->patch_make("The quick brown fox jumps over the lazy dog.", "Tha
 // +a
 //   laz
 $result = $dmp->patch_apply($patches, "The quick red rabbit jumps over the tired tiger.");
-var_dump($diffs);
+var_dump($result);
 ```
 Returns:
 ```php
