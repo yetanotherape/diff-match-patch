@@ -293,18 +293,20 @@ class DiffToolkit {
         // explode('\n', $text) would temporarily double our memory footprint,
         // but mb_strpos() and mb_substr() work slow
         $lines = explode($delimiter, $text);
+        $last_line_has_delimiter = end($lines) === '';
+        if ($last_line_has_delimiter) {
+            array_pop($lines);
+        }
         foreach ($lines as $i => $line) {
-            if (mb_strlen($line)) {
-                if (isset($lines[$i + 1])) {
-                    $line .= $delimiter;
-                }
-                if (isset($lineHash[$line])) {
-                    $chars .= Utils::unicodeChr($lineHash[$line]);
-                } else {
-                    $lineArray[] = $line;
-                    $lineHash[$line] = count($lineArray) - 1;
-                    $chars .= Utils::unicodeChr(count($lineArray) - 1);
-                }
+            if ($i + 1 < count($lines) || $last_line_has_delimiter) {
+                $line .= $delimiter;
+            }
+            if (array_key_exists($line, $lineHash)) {
+                $chars .= Utils::unicodeChr($lineHash[$line]);
+            } else {
+                $lineArray[] = $line;
+                $lineHash[$line] = count($lineArray) - 1;
+                $chars .= Utils::unicodeChr(count($lineArray) - 1);
             }
         }
 
