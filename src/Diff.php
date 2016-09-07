@@ -44,6 +44,11 @@ class Diff
     const EQUAL  = 0;
 
     /**
+     * Number of characters at which line mode speedup is employed.
+     */
+    const LINEMODE_THRESOLD = 100;
+
+    /**
      * @var float Number of seconds to map a diff before giving up (0 for infinity).
      */
     protected $timeout = 1.0;
@@ -1099,7 +1104,9 @@ class Diff
             }
         }
 
-        if ($checklines && mb_strlen($text1) > 100 && mb_strlen($text2) > 100) {
+        if ($checklines
+          && mb_strlen($text1) > Diff::LINEMODE_THRESOLD
+          && mb_strlen($text2) > Diff::LINEMODE_THRESOLD) {
             return $this->lineMode($text1, $text2, $deadline);
         }
 
