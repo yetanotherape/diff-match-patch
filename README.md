@@ -12,7 +12,7 @@ This is the port of [google-diff-match-patch](https://code.google.com/p/google-d
 
 Diff
 ----
-Compare two plain text and efficiently return a array of differences. It works with characters, but if you want to compute word-based or line-based diff — you can easily [tune](https://code.google.com/p/google-diff-match-patch/wiki/LineOrWordDiffs) it for your needs.
+Compare two plain text and efficiently return a array of differences. It works with characters, but if you want to compute word-based or line-based diff — you can easily [tune](https://web.archive.org/web/20160110201643/https://code.google.com/p/google-diff-match-patch/wiki/LineOrWordDiffs) it for your needs.
 
 Usage:
 ```php
@@ -68,7 +68,7 @@ $pos = $dmp->match_main($text, "jmped"); // Returns 20
 
 Patch
 -----
-Apply a list of patches in [Unidiff-like format](https://code.google.com/p/google-diff-match-patch/wiki/Unidiff) onto plain text. Use best-effort to apply patch even when the underlying text doesn't match.
+Apply a list of patches in [Unidiff-like format](https://web.archive.org/web/20161002083301/https://code.google.com/p/google-diff-match-patch/wiki/Unidiff) onto plain text. Use best-effort to apply patch even when the underlying text doesn't match.
 
 Usage:
 ```php
@@ -109,7 +109,7 @@ array(
 
 API
 ---
-Currently this lib available in PHP, Java, JavaScript, Dart, C++, C#, Objective C, Lua and Python. Regardless of language, each library features the same [API](https://code.google.com/p/google-diff-match-patch/wiki/API) and the same functionality. All versions also have comprehensive test harnesses.
+Currently this lib available in PHP, Java, JavaScript, Dart, C++, C#, Objective C, Lua and Python. Regardless of language, each library features the same [API](https://web.archive.org/web/20160922004754/https://code.google.com/p/google-diff-match-patch/wiki/API) and the same functionality. All versions also have comprehensive test harnesses.
 
 Algorithms
 ----------
