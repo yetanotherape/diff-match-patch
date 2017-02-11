@@ -843,8 +843,28 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         // Test the linemode speedup.
         // Must be long to pass the 100 char cutoff.
         // Simple line-mode.
-        $a = str_repeat("1234567890\n", 13);
-        $b = str_repeat("abcdefghij\n", 13);
+        $a = str_repeat("1234567890\n", ceil(Diff::LINEMODE_THRESOLD / strlen($a)));
+        $b = str_repeat("abcdefghij\n", ceil(Diff::LINEMODE_THRESOLD / strlen($b)));
+        $this->assertEquals(
+            $this->d->main($a, $b, false)->getChanges(),
+            $this->d->main($a, $b, true)->getChanges()
+        );
+
+        // Simple line-mode with multiple line breaks.
+        $a = "12345\n\n67890\n";
+        $a = str_repeat($a, ceil(Diff::LINEMODE_THRESOLD / strlen($a)));
+        $b = "abcde\n\nfghij\n";
+        $b = str_repeat($b, ceil(Diff::LINEMODE_THRESOLD / strlen($b)));
+        $this->assertEquals(
+            $this->d->main($a, $b, false)->getChanges(),
+            $this->d->main($a, $b, true)->getChanges()
+        );
+
+        // Simple line-mode with multiple line breaks but without leading line break
+        $a = "12345\n\n67890\n";
+        $a = str_repeat($a, ceil(Diff::LINEMODE_THRESOLD / strlen($a))) . '0';
+        $b = "abcde\n\nfghij\n";
+        $b = str_repeat($b, ceil(Diff::LINEMODE_THRESOLD / strlen($b))) . 'a    ';
         $this->assertEquals(
             $this->d->main($a, $b, false)->getChanges(),
             $this->d->main($a, $b, true)->getChanges()

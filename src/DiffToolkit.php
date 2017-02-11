@@ -293,43 +293,22 @@ class DiffToolkit {
         // explode('\n', $text) would temporarily double our memory footprint,
         // but mb_strpos() and mb_substr() work slow
         $lines = explode($delimiter, $text);
-        foreach ($lines as $i => $line) {
-            if (mb_strlen($line)) {
-                if (isset($lines[$i + 1])) {
-                    $line .= $delimiter;
-                }
-                if (isset($lineHash[$line])) {
-                    $chars .= Utils::unicodeChr($lineHash[$line]);
-                } else {
-                    $lineArray[] = $line;
-                    $lineHash[$line] = count($lineArray) - 1;
-                    $chars .= Utils::unicodeChr(count($lineArray) - 1);
-                }
-            }
+
+        $last_line_has_delimiter = end($lines) === '';
+        if ($last_line_has_delimiter) {
+            array_pop($lines);
         }
 
-//        // Walk the text, pulling out a substring for each line.
-//        // explode('\n', $text) would temporarily double our memory footprint.
-//        // Modifying text would create many large strings to garbage collect.
-//        $lineStart = 0;
-//        $lineEnd = -1;
-//        $textLen = mb_strlen($text);
-//        while ($lineEnd < $textLen - 1) {
-//            $lineEnd = mb_strpos($text, "\n", $lineStart);
-//            if ($lineEnd === false) {
-//                $lineEnd = $textLen - 1;
-//            }
-//            $line = mb_substr($text, $lineStart, $lineEnd + 1 - $lineStart);
-//            $lineStart = $lineEnd + 1;
-//
-//            if (isset($lineHash[$line])) {
-//                $chars .= Utils::unicodeChr($lineHash[$line]);
-//            } else {
-//                $lineArray[] = $line;
-//                $lineHash[$line] = count($lineArray) - 1;
-//                $chars .= Utils::unicodeChr(count($lineArray) - 1);
-//            }
-//        }
+        foreach ($lines as $i => $line) {
+            if (isset($lines[$i + 1]) || $last_line_has_delimiter) {
+                $line .= $delimiter;
+            }
+            if (!isset($lineHash[$line])) {
+                $lineArray[] = $line;
+                $lineHash[$line] = count($lineArray) - 1;
+            }
+            $chars .= Utils::unicodeChr($lineHash[$line]);
+        }
 
         return $chars;
     }

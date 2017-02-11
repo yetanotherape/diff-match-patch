@@ -165,13 +165,36 @@ class DiffMatchPatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->dmp->patch_toText($patches));
     }
 
-    public function testPatchApply()
-    {
-        $patches = $this->dmp->patch_make("The quick brown fox jumps over the lazy dog.", "That quick brown fox jumped over a lazy dog.");
-        $this->assertEquals(
-            array("That quick red rabbit jumped over a tired tiger.", array(true, true,)),
-            $this->dmp->patch_apply($patches, "The quick red rabbit jumps over the tired tiger.")
-        );
+    protected function _testPatchApply($text1, $text2, $target = NULL, $expected = NULL) {
+      if ($target === NULL) {
+        $target = $text1;
+      }
+      if ($expected === NULL) {
+        $expected = $text2;
+      }
+
+      $patches = $this->dmp->patch_make($text1, $text2);
+      $this->assertEquals(
+        array($expected, array_map(function() { return TRUE; }, $patches)),
+        $this->dmp->patch_apply($patches, $target)
+      );
+    }
+
+    public function testPatchApply() {
+      $this->_testPatchApply(
+        "The quick brown fox jumps over the lazy dog.",
+        "That quick brown fox jumped over a lazy dog.",
+        "The quick red rabbit jumps over the tired tiger.",
+        "That quick red rabbit jumped over a tired tiger."
+      );
+    }
+
+    public function testPatchApply_2() {
+      $linemode_pad = str_pad('pad', Diff::LINEMODE_THRESOLD, 'x');
+      $this->_testPatchApply(
+        "line number one\n\nLine number three" . $linemode_pad . 'a',
+        "LINE number one\nThe second line\n\nThis is Line number three" . $linemode_pad . 'b'
+      );
     }
 
 }
