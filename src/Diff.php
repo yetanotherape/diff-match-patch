@@ -959,8 +959,11 @@ class Diff
             return $this;
         }
 
+        // Strings with these encodings will not be encoded/decoded to UCS-2LE:
+        $encodingsToSkip = array('UTF-8', 'UCS-2LE');
+
         $prevInternalEncoding = mb_internal_encoding();
-        if ($prevInternalEncoding != 'UCS-2LE') {
+        if (!in_array($prevInternalEncoding, $encodingsToSkip)) {
             mb_internal_encoding('UCS-2LE');
             $text1 = iconv($prevInternalEncoding, 'UCS-2LE', $text1);
             $text2 = iconv($prevInternalEncoding, 'UCS-2LE', $text2);
@@ -997,7 +1000,7 @@ class Diff
             array_push($diffs, array(self::EQUAL, $commonSuffix));
         }
 
-        if ($prevInternalEncoding != 'UCS-2LE') {
+        if (!in_array($prevInternalEncoding, $encodingsToSkip)) {
             mb_internal_encoding($prevInternalEncoding);
             foreach ($diffs as &$change) {
                 $change[1] = iconv('UCS-2LE', $prevInternalEncoding, $change[1]);
