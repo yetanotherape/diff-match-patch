@@ -1,5 +1,8 @@
-Diff-Match-Patch [![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.svg?branch=master)](https://travis-ci.org/yetanotherape/diff-match-patch)
-================
+# Diff-Match-Patch 
+[![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.svg?branch=master)](https://travis-ci.org/yetanotherape/diff-match-patch)
+[![Latest Stable Version](https://poser.pugx.org/yetanotherape/diff-match-patch/v/stable)](https://packagist.org/packages/yetanotherape/diff-match-patch)
+[![Total Downloads](https://poser.pugx.org/yetanotherape/diff-match-patch/downloads)](https://packagist.org/packages/yetanotherape/diff-match-patch)
+
 The Diff Match and Patch libraries offer robust algorithms to perform the operations required for synchronizing plain 
 text:
 
@@ -9,8 +12,8 @@ text:
 
 This is the port of Google's [diff-match-patch](https://github.com/google/diff-match-patch) library to PHP.
 
-Diff
-----
+## Diff
+
 Compare two plain text and efficiently return a array of differences. It works with characters, but if you want 
 to compute word-based or line-based diff — you can easily 
 [tune](https://web.archive.org/web/20160110201643/https://code.google.com/p/google-diff-match-patch/wiki/LineOrWordDiffs) 
@@ -46,8 +49,8 @@ array(
 
 [Demo](http://neil.fraser.name/software/diff_match_patch/svn/trunk/demos/demo_diff.html)
 
-Match
------
+## Match
+
 Given a search string, find its best fuzzy match in a plain text near the given location. Weighted for both accuracy 
 and location.
 
@@ -69,8 +72,8 @@ $pos = $dmp->match_main($text, "jmped"); // Returns 20
 
 [Demo](http://neil.fraser.name/software/diff_match_patch/svn/trunk/demos/demo_diff.html)
 
-Patch
------
+## Patch
+
 Apply a list of patches in 
 [Unidiff-like format](https://web.archive.org/web/20161002083301/https://code.google.com/p/google-diff-match-patch/wiki/Unidiff) 
 onto plain text. Use best-effort to apply patch even when the underlying text doesn't match.
@@ -112,8 +115,8 @@ array(
 
 [Demo](http://neil.fraser.name/software/diff_match_patch/svn/trunk/demos/demo_patch.html)
 
-API
----
+## API
+
 Currently this library available in:
  * PHP
  * [C++](https://github.com/google/diff-match-patch/wiki/Language:-Cpp)
@@ -129,8 +132,8 @@ Regardless of language, each library uses the same
 [API](https://web.archive.org/web/20160922004754/https://code.google.com/p/google-diff-match-patch/wiki/API) 
 and the same functionality.
 
-Algorithms
-----------
+## Algorithms
+
 This library implements [Myer's diff algorithm](http://neil.fraser.name/software/diff_match_patch/myers.pdf) which is 
 generally considered to be the best general-purpose diff. A layer of 
 [pre-diff speedups and post-diff cleanups](http://neil.fraser.name/writing/diff/) surround the diff algorithm, improving 
@@ -139,13 +142,13 @@ both performance and output quality.
 This library also implements a [Bitap matching algorithm](http://en.wikipedia.org/wiki/Bitap_algorithm) at the heart 
 of a flexible [matching and patching strategy](http://neil.fraser.name/writing/patch/).
 
-Requirements
-------------
+## Requirements
+
 * PHP 5.3+
 * [Composer](http://getcomposer.org/)
 
-License
--------
+## License
+
 Diff-Match-Patch is licensed under the Apache License 2.0 - see the `LICENSE` file for details
 
 
