@@ -9,8 +9,8 @@ php:
   - 7.2
   - hhvm
 
-#before_script:
-#  - composer install
+install:
+  - composer install
 
 matrix:
   include:
