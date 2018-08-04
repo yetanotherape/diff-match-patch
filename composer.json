@@ -18,8 +18,9 @@
     ],
     "require": {
         "php": ">=5.3",
-        "ext-mbstring": "*",
-        "lib-iconv": "*"
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*"

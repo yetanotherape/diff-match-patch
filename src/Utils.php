@@ -28,7 +28,8 @@ namespace DiffMatchPatch;
  * @package DiffMatchPatch
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class Utils {
+class Utils
+{
     /**
      * Multibyte replacement for standard chr()
      *
@@ -56,7 +57,11 @@ class Utils {
         if (mb_internal_encoding() != 'UCS-2LE') {
             $char = iconv(mb_internal_encoding(), 'UCS-2LE', $char);
         }
-        $code = ord($char[0]) + 256 * ord($char[1]);
+
+        $code = 0;
+        for ($i = 0; $i < strlen($char); $i++) {
+            $code += ord($char[$i]) * pow(256, $i);
+        }
 
         return $code;
     }
@@ -72,7 +77,7 @@ class Utils {
     public static function escapeString($string)
     {
         $string = rawurlencode($string);
-        $string = strtr($string, array (
+        $string = strtr($string, array(
             '%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')', '%3B' => ';', '%2F' => '/', '%3F' => '?',
             '%3A' => ':', '%40' => '@', '%26' => '&', '%3D' => '=', '%2B' => '+', '%24' => '$', '%2C' => ',', '%23' => '#', '%20' => ' '
         ));
@@ -89,7 +94,7 @@ class Utils {
      */
     public static function unescapeString($string)
     {
-        $string = strtr($string, array (
+        $string = strtr($string, array(
             '%21' => '%2521', '%2A' => '%252A', '%27' => "%2527", '%28' => '%2528', '%29' => '%2529', '%3B' => '%253B', '%2F' => '%252F', '%3F' => '%253F',
             '%3A' => '%253A', '%40' => '%2540', '%26' => '%2526', '%3D' => '%253D', '%2B' => '%252B', '%24' => '%2524', '%2C' => '%252C', '%23' => '%2523', '%20' => '%2520'
         ));

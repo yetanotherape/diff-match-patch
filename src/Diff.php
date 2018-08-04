@@ -965,10 +965,27 @@ class Diff
         }
 
         $prevInternalEncoding = mb_internal_encoding();
-        if ($prevInternalEncoding != 'UCS-2LE') {
-            mb_internal_encoding('UCS-2LE');
-            $text1 = iconv($prevInternalEncoding, 'UCS-2LE', $text1);
-            $text2 = iconv($prevInternalEncoding, 'UCS-2LE', $text2);
+        $newInternalEncoding = 'UCS-2LE';
+        if ($prevInternalEncoding != $newInternalEncoding) {
+            mb_internal_encoding($newInternalEncoding);
+
+            $errorReportingLevel = error_reporting();
+            error_reporting($errorReportingLevel & ~E_NOTICE);
+
+            $text1Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text1);
+            $text2Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text2);
+
+            if ($text1Draft === false || $text2Draft === false) {
+                $newInternalEncoding = 'UCS-4LE';
+
+                $text1Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text1);
+                $text2Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text2);
+            }
+
+            $text1 = $text1Draft;
+            $text2 = $text2Draft;
+
+            error_reporting($errorReportingLevel);
         }
 
         // Trim off common prefix (speedup).
@@ -1002,10 +1019,10 @@ class Diff
             array_push($diffs, array(self::EQUAL, $commonSuffix));
         }
 
-        if ($prevInternalEncoding != 'UCS-2LE') {
+        if ($newInternalEncoding != $prevInternalEncoding) {
             mb_internal_encoding($prevInternalEncoding);
             foreach ($diffs as &$change) {
-                $change[1] = iconv('UCS-2LE', $prevInternalEncoding, $change[1]);
+                $change[1] = iconv($newInternalEncoding, $prevInternalEncoding, $change[1]);
             }
             unset($change);
         }
