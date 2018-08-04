@@ -1,18 +1,20 @@
-Diff-Match-Patch [![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.png)](https://travis-ci.org/yetanotherape/diff-match-patch)
+Diff-Match-Patch [![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.svg?branch=master)](https://travis-ci.org/yetanotherape/diff-match-patch)
 ================
-The Diff Match and Patch libraries offer robust algorithms to perform the operations required for synchronizing plain text:
+The Diff Match and Patch libraries offer robust algorithms to perform the operations required for synchronizing plain 
+text:
 
 * computes character-based diff of two texts
 * performs fuzzy match of given string
-* applies patches onto changed base text.
+* applies a list of patches.
 
-This is the port of [google-diff-match-patch](https://code.google.com/p/google-diff-match-patch/) lib to PHP.
-
-**NOTE: This is alpha software and is under development.**
+This is the port of Google's [diff-match-patch](https://github.com/google/diff-match-patch) library to PHP.
 
 Diff
 ----
-Compare two plain text and efficiently return a array of differences. It works with characters, but if you want to compute word-based or line-based diff — you can easily [tune](https://web.archive.org/web/20160110201643/https://code.google.com/p/google-diff-match-patch/wiki/LineOrWordDiffs) it for your needs.
+Compare two plain text and efficiently return a array of differences. It works with characters, but if you want 
+to compute word-based or line-based diff — you can easily 
+[tune](https://web.archive.org/web/20160110201643/https://code.google.com/p/google-diff-match-patch/wiki/LineOrWordDiffs) 
+it for your needs.
 
 Usage:
 ```php
@@ -46,7 +48,8 @@ array(
 
 Match
 -----
-Given a search string, find its best fuzzy match in a plain text near the given location. Weighted for both accuracy and location.
+Given a search string, find its best fuzzy match in a plain text near the given location. Weighted for both accuracy 
+and location.
 
 Usage:
 ```php
@@ -68,7 +71,9 @@ $pos = $dmp->match_main($text, "jmped"); // Returns 20
 
 Patch
 -----
-Apply a list of patches in [Unidiff-like format](https://web.archive.org/web/20161002083301/https://code.google.com/p/google-diff-match-patch/wiki/Unidiff) onto plain text. Use best-effort to apply patch even when the underlying text doesn't match.
+Apply a list of patches in 
+[Unidiff-like format](https://web.archive.org/web/20161002083301/https://code.google.com/p/google-diff-match-patch/wiki/Unidiff) 
+onto plain text. Use best-effort to apply patch even when the underlying text doesn't match.
 
 Usage:
 ```php
@@ -109,13 +114,30 @@ array(
 
 API
 ---
-Currently this lib available in PHP, Java, JavaScript, Dart, C++, C#, Objective C, Lua and Python. Regardless of language, each library features the same [API](https://web.archive.org/web/20160922004754/https://code.google.com/p/google-diff-match-patch/wiki/API) and the same functionality. All versions also have comprehensive test harnesses.
+Currently this library available in:
+ * PHP
+ * [C++](https://github.com/google/diff-match-patch/wiki/Language:-Cpp)
+ * [C#](https://github.com/google/diff-match-patch/wiki/Language:-C%23)
+ * [Dart](https://github.com/google/diff-match-patch/wiki/Language:-Dart)
+ * [Java](https://github.com/google/diff-match-patch/wiki/Language:-Java)
+ * [JavaScript](https://github.com/google/diff-match-patch/wiki/Language:-JavaScript)
+ * [Lua](https://github.com/google/diff-match-patch/wiki/Language:-Lua)
+ * [Objective-C](https://github.com/google/diff-match-patch/wiki/Language:-Objective-C)
+ * [Python](https://github.com/google/diff-match-patch/wiki/Language:-Python)
+
+Regardless of language, each library uses the same 
+[API](https://web.archive.org/web/20160922004754/https://code.google.com/p/google-diff-match-patch/wiki/API) 
+and the same functionality.
 
 Algorithms
 ----------
-This library implements [Myer's diff algorithm](http://neil.fraser.name/software/diff_match_patch/myers.pdf) which is generally considered to be the best general-purpose diff. A layer of [pre-diff speedups and post-diff cleanups](http://neil.fraser.name/writing/diff/) surround the diff algorithm, improving both performance and output quality.
+This library implements [Myer's diff algorithm](http://neil.fraser.name/software/diff_match_patch/myers.pdf) which is 
+generally considered to be the best general-purpose diff. A layer of 
+[pre-diff speedups and post-diff cleanups](http://neil.fraser.name/writing/diff/) surround the diff algorithm, improving 
+both performance and output quality.
 
-This library also implements a [Bitap matching algorithm](http://en.wikipedia.org/wiki/Bitap_algorithm) at the heart of a flexible [matching and patching strategy](http://neil.fraser.name/writing/patch/).
+This library also implements a [Bitap matching algorithm](http://en.wikipedia.org/wiki/Bitap_algorithm) at the heart 
+of a flexible [matching and patching strategy](http://neil.fraser.name/writing/patch/).
 
 Requirements
 ------------
