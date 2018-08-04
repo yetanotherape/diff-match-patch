@@ -816,6 +816,17 @@ class DiffTest extends \PHPUnit_Framework_TestCase
             $this->d->main("a [[Pennsylvania]] and [[New", " and [[Pennsylvania]]", false)->getChanges()
         );
 
+        // Emoji
+        $this->assertEquals(
+            array(
+                array(Diff::EQUAL, "Car"),
+                array(Diff::INSERT, " — 🚘"),
+                array(Diff::EQUAL, "!"),
+            ),
+            $this->d->main("Car!", "Car — 🚘!", false)->getChanges()
+        );
+
+
         // Timeout.
         // 100ms
         $this->d->setTimeout(0.1);

@@ -291,7 +291,7 @@ class DiffToolkit {
 
         // TODO optimize code
         // explode('\n', $text) would temporarily double our memory footprint,
-        // but mb_strpos() and mb_substr() work slow
+        // but mb_strpos() and mb_substr() work too slow
         $lines = explode($delimiter, $text);
 
         $last_line_has_delimiter = end($lines) === '';

@@ -19,9 +19,9 @@
  * limitations under the License.
  */
 
-require __DIR__ . "/../../src/DiffMatchPatch/Diff.php";
-require __DIR__ . "/../../src/DiffMatchPatch/DiffToolkit.php";
-require __DIR__ . "/../../src/DiffMatchPatch/Utils.php";
+require __DIR__ . "/../src/Diff.php";
+require __DIR__ . "/../src/DiffToolkit.php";
+require __DIR__ . "/../src/Utils.php";
 
 use DiffMatchPatch\Diff;
 
