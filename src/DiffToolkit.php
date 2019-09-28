@@ -190,7 +190,7 @@ class DiffToolkit {
             $hm = $hm2;
         } else {
             // Both matched.  Select the longest.
-            if (mb_strlen($hm1[4] > $hm2[4])) {
+            if (mb_strlen($hm1[4]) > mb_strlen($hm2[4])) {
                 $hm = $hm1;
             } else {
                 $hm = $hm2;
