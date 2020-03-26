@@ -919,4 +919,19 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testMultiByteEmojis()
+    {
+        // Replacing one emoji outside the BMP with another
+        $a = '😀';
+        $b = '😁';
+
+        // Would expect a to be removed and b to be added
+        $expectedChanges = array(
+            array(-1, '😀'),
+            array(1, '😁'),
+        );
+
+        $changes = $this->d->main($a, $b)->getChanges();
+        $this->assertEquals($expectedChanges, $changes);
+    }
 }

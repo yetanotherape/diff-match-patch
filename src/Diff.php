@@ -967,8 +967,6 @@ class Diff
         $prevInternalEncoding = mb_internal_encoding();
         $newInternalEncoding = 'UCS-2LE';
         if ($prevInternalEncoding != $newInternalEncoding) {
-            mb_internal_encoding($newInternalEncoding);
-
             $errorReportingLevel = error_reporting();
             error_reporting($errorReportingLevel & ~E_NOTICE);
 
@@ -981,6 +979,8 @@ class Diff
                 $text1Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text1);
                 $text2Draft = iconv($prevInternalEncoding, $newInternalEncoding, $text2);
             }
+
+            mb_internal_encoding($newInternalEncoding);
 
             $text1 = $text1Draft;
             $text2 = $text2Draft;
