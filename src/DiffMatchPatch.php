@@ -66,9 +66,9 @@ class DiffMatchPatch
      */
     protected $diff;
     /**
-     * @var Match
+     * @var Matcher
      */
-    protected $match;
+    protected $matcher;
     /**
      * @var Patch
      */
@@ -92,13 +92,13 @@ class DiffMatchPatch
                 $result = $this->diff->getEditCost();
                 break;
             case 'Match_Threshold':
-                $result = $this->match->getThreshold();
+                $result = $this->matcher->getThreshold();
                 break;
             case 'Match_Distance':
-                $result = $this->match->getDistance();
+                $result = $this->matcher->getDistance();
                 break;
             case 'Match_MaxBits':
-                $result = $this->match->getMaxBits();
+                $result = $this->matcher->getMaxBits();
                 break;
             case 'Patch_DeleteThreshold':
                 $result = $this->patch->getDeleteTreshold();
@@ -132,13 +132,13 @@ class DiffMatchPatch
                 $this->diff->setEditCost($value);
                 break;
             case 'Match_Threshold':
-                $this->match->setThreshold($value);
+                $this->matcher->setThreshold($value);
                 break;
             case 'Match_Distance':
-                $this->match->setDistance($value);
+                $this->matcher->setDistance($value);
                 break;
             case 'Match_MaxBits':
-                $this->match->setMaxBits($value);
+                $this->matcher->setMaxBits($value);
                 break;
             case 'Patch_DeleteThreshold':
                 $this->patch->setDeleteTreshold($value);
@@ -154,8 +154,8 @@ class DiffMatchPatch
     public function __construct()
     {
         $this->diff = new Diff();
-        $this->match = new Match();
-        $this->patch = new Patch($this->diff, $this->match);
+        $this->matcher = new Matcher();
+        $this->patch = new Patch($this->diff, $this->matcher);
     }
 
     /**
@@ -240,7 +240,7 @@ class DiffMatchPatch
      */
     public function match_main($text, $pattern, $loc = 0)
     {
-        return $this->match->main($text, $pattern, $loc);
+        return $this->matcher->main($text, $pattern, $loc);
     }
 
     /**

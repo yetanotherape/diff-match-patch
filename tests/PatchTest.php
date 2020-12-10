@@ -21,12 +21,14 @@
 
 namespace DiffMatchPatch;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @package DiffMatchPatch
  * @author Neil Fraser <fraser@google.com>
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class PatchTest extends \PHPUnit_Framework_TestCase
+class PatchTest extends TestCase
 {
     /**
      * @var Diff
@@ -41,11 +43,11 @@ class PatchTest extends \PHPUnit_Framework_TestCase
      */
     protected $m;
 
-    protected  function setUp() {
+    protected  function setUp():void {
         mb_internal_encoding('UTF-8');
 
         $this->d = new Diff();
-        $this->m = new Match();
+        $this->m = new Matcher();
         // Assumes that Match->maxBits is 32.
         $this->m->setMaxBits(32);
         $this->p = new Patch($this->d, $this->m);

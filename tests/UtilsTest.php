@@ -21,14 +21,16 @@
 
 namespace DiffMatchPatch;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @package DiffMatchPatch
  * @author Neil Fraser <fraser@google.com>
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class UtilsTest extends \PHPUnit_Framework_TestCase
+class UtilsTest extends TestCase
 {
-    protected  function setUp() {
+    protected  function setUp():void {
         mb_internal_encoding('UTF-8');
     }
 

@@ -21,19 +21,21 @@
 
 namespace DiffMatchPatch;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * @package DiffMatchPatch
  * @author Neil Fraser <fraser@google.com>
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class DiffTest extends \PHPUnit_Framework_TestCase
+class DiffTest extends TestCase
 {
     /**
      * @var Diff
      */
     protected $d;
 
-    protected  function setUp() {
+    protected  function setUp(): void {
         mb_internal_encoding('UTF-8');
 
         $this->d = new Diff();

@@ -21,6 +21,8 @@
 
 namespace DiffMatchPatch;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * DiffMatchPatchTest tests that all methods successfully proxies.
  * DiffTest, MatchTest and PatchTest contains all other unit tests.
@@ -29,14 +31,14 @@ namespace DiffMatchPatch;
  * @author Neil Fraser <fraser@google.com>
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class DiffMatchPatchTest extends \PHPUnit_Framework_TestCase
+class DiffMatchPatchTest extends TestCase
 {
     /**
      * @var DiffMatchPatch
      */
     protected $dmp;
 
-    protected  function setUp() {
+    protected  function setUp():void {
         mb_internal_encoding('UTF-8');
 
         $this->dmp = new DiffMatchPatch();
