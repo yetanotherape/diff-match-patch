@@ -125,10 +125,10 @@ class Match {
         }
 
         $loc = max(0, min($loc, mb_strlen($text)));
-        if ($text == $pattern) {
+        if ($text === $pattern) {
             // Shortcut (potentially not guaranteed by the algorithm)
             return 0;
-        } elseif ($text == '') {
+        } elseif ($text === '') {
             // Nothing to match.
             return -1;
         } elseif (mb_substr($text, $loc, mb_strlen($pattern)) == $pattern) {

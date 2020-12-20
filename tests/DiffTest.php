@@ -919,4 +919,30 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testNumeric()
+    {
+        $this->assertEquals(
+            array(
+                array(Diff::DELETE, "0"),
+                array(Diff::INSERT, "1"),
+            ),
+            $this->d->main("0", "1", false)->getChanges()
+        );
+
+        $this->assertEquals(
+            array(
+                array(Diff::EQUAL, "0"),
+                array(Diff::INSERT, "0"),
+            ),
+            $this->d->main("0", "00", false)->getChanges()
+        );
+
+        $this->assertEquals(
+            array(
+                array(Diff::INSERT, "0"),
+                array(Diff::EQUAL, "1"),
+            ),
+            $this->d->main("1", "01", false)->getChanges()
+        );
+	}
 }

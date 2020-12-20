@@ -40,7 +40,7 @@ class DiffToolkit {
     public function commonPrefix($text1, $text2)
     {
         // Quick check for common null cases.
-        if ($text1 == '' || $text2 == '' || mb_substr($text1, 0, 1) != mb_substr($text2, 0, 1)) {
+        if ($text1 === '' || $text2 === '' || mb_substr($text1, 0, 1) !== mb_substr($text2, 0, 1)) {
             return 0;
         }
         // Binary search.
@@ -50,7 +50,7 @@ class DiffToolkit {
         $pointermid = $pointermax;
         $pointerstart = 0;
         while ($pointermin < $pointermid) {
-            if (mb_substr($text1, $pointerstart, $pointermid - $pointerstart) == mb_substr($text2, $pointerstart,
+            if (mb_substr($text1, $pointerstart, $pointermid - $pointerstart) === mb_substr($text2, $pointerstart,
                     $pointermid - $pointerstart)
             ) {
                 $pointermin = $pointermid;
@@ -75,7 +75,7 @@ class DiffToolkit {
     public function commonSuffix($text1, $text2)
     {
         // Quick check for common null cases.
-        if ($text1 == '' || $text2 == '' || mb_substr($text1, -1, 1) != mb_substr($text2, -1, 1)) {
+        if ($text1 === '' || $text2 === '' || mb_substr($text1, -1, 1) !== mb_substr($text2, -1, 1)) {
             return 0;
         }
         // Binary search.
@@ -85,7 +85,7 @@ class DiffToolkit {
         $pointermid = $pointermax;
         $pointerend = 0;
         while ($pointermin < $pointermid) {
-            if (mb_substr($text1, -$pointermid, $pointermid - $pointerend) == mb_substr($text2, -$pointermid,
+            if (mb_substr($text1, -$pointermid, $pointermid - $pointerend) === mb_substr($text2, -$pointermid,
                     $pointermid - $pointerend)
             ) {
                 $pointermin = $pointermid;
@@ -127,7 +127,7 @@ class DiffToolkit {
         $text_length = min($text1_length, $text2_length);
 
         // Quick check for the worst case.
-        if ($text1 == $text2) {
+        if ($text1 === $text2) {
             return $text_length;
         }
 
@@ -143,7 +143,7 @@ class DiffToolkit {
                 break;
             }
             $length += $found;
-            if ($found == 0 || mb_substr($text1, -$length) == mb_substr($text2, 0, $length)) {
+            if ($found == 0 || mb_substr($text1, -$length) === mb_substr($text2, 0, $length)) {
                 $best = $length;
                 $length += 1;
             }
@@ -256,7 +256,7 @@ class DiffToolkit {
      */
     public function linesToChars($text1, $text2)
     {
-        // e.g. $lineArray[4] == "Hello\n"
+        // e.g. $lineArray[4] === "Hello\n"
         $lineArray = array();
         // e.g. $lineHash["Hello\n"] == 4
         $lineHash = array();

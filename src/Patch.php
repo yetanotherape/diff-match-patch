@@ -140,20 +140,20 @@ class Patch
             }
             $patch = new PatchObject();
             $patch->setStart1($m[1]);
-            if ($m[2] == '') {
+            if ($m[2] === '') {
                 $patch->setStart1($patch->getStart1() - 1);
                 $patch->setLength1(1);
-            } elseif ($m[2] == '0') {
+            } elseif ($m[2] === '0') {
                 $patch->setLength1(0);
             } else {
                 $patch->setStart1($patch->getStart1() - 1);
                 $patch->setLength1($m[2]);
             }
             $patch->setStart2($m[3]);
-            if ($m[4] == '') {
+            if ($m[4] === '') {
                 $patch->setStart2($patch->getStart2() - 1);
                 $patch->setLength2(1);
-            } elseif ($m[4] == '0') {
+            } elseif ($m[4] === '0') {
                 $patch->setLength2(0);
             } else {
                 $patch->setStart2($patch->getStart2() - 1);
@@ -235,7 +235,7 @@ class Patch
         // If two different matches are found, increase the pattern length.
         $match = $this->getMatch();
         while (
-            (!$pattern || mb_strpos($text, $pattern) !== mb_strrpos($text, $pattern)) &&
+            ($pattern === '' || mb_strpos($text, $pattern) !== mb_strrpos($text, $pattern)) &&
             ($match->getMaxBits() == 0 || mb_strlen($pattern) < $match->getMaxBits() - 2 * $this->getMargin())
         ) {
             $padding += $this->getMargin();
@@ -250,12 +250,12 @@ class Patch
 
         // Add the prefix.
         $prefix = mb_substr($text, max(0, $patch->getStart2() - $padding), min($patch->getStart2(), $padding));
-        if ($prefix != '') {
+        if ($prefix !== '') {
             $patch->prependChanges(array(Diff::EQUAL, $prefix));
         }
         // Add the suffix.
         $suffix = mb_substr($text, $patch->getStart2() + $patch->getLength1(), $padding);
-        if ($suffix != '') {
+        if ($suffix !== '') {
             $patch->appendChanges(array(Diff::EQUAL, $suffix));
         }
 
@@ -437,7 +437,7 @@ class Patch
                 $patch->setStart1($start1 - $preContextLen);
                 $patch->setStart2($start2 - $preContextLen);
 
-                if ($preContext != '') {
+                if ($preContext !== '') {
                     $patch->setLength1($preContextLen);
                     $patch->setLength2($preContextLen);
                     $patch->appendChanges(array(Diff::EQUAL, $preContext));
@@ -478,7 +478,7 @@ class Patch
                             $empty = false;
                         }
 
-                        if ($diffText == $bigPatchDiffs[0][1]) {
+                        if ($diffText === $bigPatchDiffs[0][1]) {
                             array_shift($bigPatchDiffs);
                         } else {
                             $bigPatchDiffs[0][1] = mb_substr($bigPatchDiffs[0][1], $diffTextLen);
@@ -497,7 +497,7 @@ class Patch
                 $diff->setChanges($bigPatchDiffs);
                 $postContext = $diff->text1();
                 $postContext = mb_substr($postContext, 0, $this->getMargin());
-                if ($postContext != '') {
+                if ($postContext !== '') {
                     $patch->setLength1($patch->getLength1() + mb_strlen($postContext));
                     $patch->setLength2($patch->getLength2() + mb_strlen($postContext));
                     if (
@@ -660,7 +660,7 @@ class Patch
                 } else {
                     $text2 = mb_substr($text, $startLoc, $endLoc + $maxBits - $startLoc);
                 }
-                if ($text1 == $text2) {
+                if ($text1 === $text2) {
                     // Perfect match, just shove the replacement text in.
                     $text = mb_substr($text, 0, $startLoc) . $diff->text2() .
                         mb_substr($text, $startLoc + $text1Len);
