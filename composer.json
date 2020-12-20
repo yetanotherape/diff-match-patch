@@ -1,9 +1,9 @@
 {
     "name": "yetanotherape/diff-match-patch",
-    "description": "Port of the google-diff-match-patch (https://code.google.com/p/google-diff-match-patch/) lib to PHP",
+    "description": "Port of the google-diff-match-patch (https://github.com/google/diff-match-patch) lib to PHP",
     "type": "library",
     "keywords": ["Diff", "Match", "Patch", "Fuzzy search"],
-    "homepage": "https://code.google.com/p/google-diff-match-patch/",
+    "homepage": "https://github.com/yetanotherape/diff-match-patch",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3",
+        "php": ">=5.3, <=7.4",
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-mbstring": "*"
