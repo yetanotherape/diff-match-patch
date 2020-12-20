@@ -28,7 +28,7 @@ namespace DiffMatchPatch;
  * @author Neil Fraser <fraser@google.com>
  * @author Daniil Skrobov <yetanotherape@gmail.com>
  */
-class Match {
+class Matcher {
 
     /**
      * @var float At what point is no match declared (0.0 = perfection, 1.0 = very loose).

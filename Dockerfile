@@ -16,4 +16,4 @@ CMD [ "/bin/bash" ]
 # export PHP_VERSION=7.2
 # docker build -t dmp:${PHP_VERSION} --build-arg PHP_VERSION=${PHP_VERSION} .
 # docker run -it --rm dmp:${PHP_VERSION} ./vendor/bin/phpunit
-# docker run -it --rm -v `pwd`:/usr/src/myapp dmp:${PHP_VERSION}
+# docker run -it --rm -v `pwd`/src:/app/src -v `pwd`/tests:/app/tests dmp:${PHP_VERSION}

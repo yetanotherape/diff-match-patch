@@ -46,25 +46,25 @@ class Patch
      */
     protected $diff;
     /**
-     * @var Match
+     * @var Matcher
      */
-    protected $match;
+    protected $matcher;
 
     /**
      * @param Diff|null $diff
-     * @param Match|null $match
+     * @param Matcher|null $matcher
      */
-    public function __construct(Diff $diff = null, Match $match = null)
+    public function __construct(Diff $diff = null, Matcher $matcher = null)
     {
-        if (!isset($match)) {
-            $match = new Match();
+        if (!isset($matcher)) {
+            $matcher = new Matcher();
         }
         if (!isset($diff)) {
             $diff = new Diff();
         }
 
         $this->diff = $diff;
-        $this->match = $match;
+        $this->matcher = $matcher;
     }
 
     /**
@@ -100,11 +100,11 @@ class Patch
     }
 
     /**
-     * @return Match
+     * @return Matcher
      */
-    protected function getMatch()
+    protected function getMatcher()
     {
-        return $this->match;
+        return $this->matcher;
     }
 
     /**
@@ -233,10 +233,10 @@ class Patch
 
         // Look for the first and last matches of pattern in text.
         // If two different matches are found, increase the pattern length.
-        $match = $this->getMatch();
+        $matcher = $this->getMatcher();
         while (
             (!$pattern || mb_strpos($text, $pattern) !== mb_strrpos($text, $pattern)) &&
-            ($match->getMaxBits() == 0 || mb_strlen($pattern) < $match->getMaxBits() - 2 * $this->getMargin())
+            ($matcher->getMaxBits() == 0 || mb_strlen($pattern) < $matcher->getMaxBits() - 2 * $this->getMargin())
         ) {
             $padding += $this->getMargin();
             $pattern = mb_substr(
@@ -409,7 +409,7 @@ class Patch
      */
     public function splitMax(&$patches)
     {
-        $patchSize = $this->getMatch()->getMaxBits();
+        $patchSize = $this->getMatcher()->getMaxBits();
         if ($patchSize == 0) {
             // TODO PHP has fixed size int, so this case isn't relevant.
             return;
@@ -619,8 +619,8 @@ class Patch
         $delta = 0;
         $results = array();
         $diff = $this->getDiff();
-        $match = $this->getMatch();
-        $maxBits = $match->getMaxBits();
+        $matcher = $this->getMatcher();
+        $maxBits = $matcher->getMaxBits();
 
         foreach ($patches as $patch) {
             $expectedLoc = $patch->getStart2() + $delta;
@@ -632,10 +632,10 @@ class Patch
             if ($text1Len > $maxBits) {
                 // self::splitMax() will only provide an oversized pattern in the case of
                 // a monster delete.
-                $startLoc = $match->main($text, mb_substr($text1, 0, $maxBits), $expectedLoc);
+                $startLoc = $matcher->main($text, mb_substr($text1, 0, $maxBits), $expectedLoc);
 
                 if ($startLoc != -1) {
-                    $endLoc = $match->main($text, mb_substr($text1, -$maxBits),
+                    $endLoc = $matcher->main($text, mb_substr($text1, -$maxBits),
                         $expectedLoc + $text1Len - $maxBits);
                     if ($endLoc == -1 || $startLoc >= $endLoc) {
                         // Can't find valid trailing context.  Drop this patch.
@@ -643,7 +643,7 @@ class Patch
                     }
                 }
             } else {
-                $startLoc = $match->main($text, $text1, $expectedLoc);
+                $startLoc = $matcher->main($text, $text1, $expectedLoc);
             }
 
             if ($startLoc == -1) {

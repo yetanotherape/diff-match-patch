@@ -24,3 +24,4 @@ Thumbs.db
 # Stub for empty folders #
 ##########################
 !.gitkeep
+.phpunit.result.cache
