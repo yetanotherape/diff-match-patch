@@ -144,7 +144,7 @@ of a flexible [matching and patching strategy](http://neil.fraser.name/writing/p
 
 ## Requirements
 
-* PHP 5.3+
+* PHP 7.3+
 * [Composer](http://getcomposer.org/)
 
 ## License
