@@ -68,6 +68,11 @@ function unicodeChr4($code)
     }
 }
 
+function unicodeChr5($code)
+{
+    return iconv('UCS-4LE', 'UTF-8', pack('V', $code));
+}
+
 function unicodeOrd1($char)
 {
     if (mb_internal_encoding() != 'UCS-4LE') {
@@ -89,77 +94,26 @@ function unicodeOrd1($char)
 //var_dump(mb_strlen(unicodeChr2(97)) === mb_strlen(unicodeChr3(97)));
 //exit;
 
-$code = 97;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . 'a' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-$code = 255;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . 'ÿ' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-$code = 256;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . 'Ā' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-$code = 260;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . 'Ą' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-$code = 65535;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . '?' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-$code = 65536;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . '𐀀' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
-
-$code = 128570;
-echo 'code = ' . $code . PHP_EOL;
-echo 'char = ' . '😺' . PHP_EOL;
-echo 'chr() = ' . chr($code) . PHP_EOL;
-echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
-echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
-echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
-echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
-echo PHP_EOL;
-
+$codeList = [
+    97 => 'a',
+    255 => 'ÿ',
+    256 => 'Ā',
+    260 => 'Ą',
+    65535 => '?',
+    65536 => '𐀀',
+    128570 => '😺',
+];
+foreach ($codeList as $code => $char) {
+    echo 'code = ' . $code . PHP_EOL;
+    echo 'char = ' . $char . PHP_EOL;
+    echo 'chr() = ' . chr($code) . PHP_EOL;
+    echo 'unicodeChr1() = ' . unicodeChr1($code) . PHP_EOL;
+    echo 'unicodeChr2() = ' . unicodeChr2($code) . PHP_EOL;
+    echo 'unicodeChr3() = ' . unicodeChr3($code) . PHP_EOL;
+    echo 'unicodeChr4() = ' . unicodeChr4($code) . PHP_EOL;
+    echo 'unicodeChr5() = ' . unicodeChr5($code) . PHP_EOL;
+    echo PHP_EOL;
+}
 
 $char = 'a';
 echo 'char = ' . $char . PHP_EOL;
@@ -233,6 +187,18 @@ echo 'unicodeChr3(), M = ' . $M . PHP_EOL;
 echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
 echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
 
+// unicodeChr5(), M = 255
+$timeStart = microtime(1);
+$M = 255;
+for ($i = 0; $i < $N; $i++) {
+    $char = unicodeChr5($i % $M);
+}
+$timeElapsed = microtime(1) - $timeStart;
+echo 'unicodeChr5(), M = ' . $M . PHP_EOL;
+echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
+echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
+
+
 // unicodeChr1(), M = 65535
 $timeStart = microtime(1);
 $M = 65535;
@@ -275,6 +241,17 @@ for ($i = 0; $i < $N; $i++) {
 }
 $timeElapsed = microtime(1) - $timeStart;
 echo 'unicodeChr4(), M = ' . $M . PHP_EOL;
+echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
+echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
+
+// unicodeChr5(), M = 65535
+$timeStart = microtime(1);
+$M = 65535;
+for ($i = 0; $i < $N; $i++) {
+    $char = unicodeChr5($i % $M);
+}
+$timeElapsed = microtime(1) - $timeStart;
+echo 'unicodeChr5(), M = ' . $M . PHP_EOL;
 echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
 echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
 
@@ -321,5 +298,16 @@ for ($i = 0; $i < $N; $i++) {
 }
 $timeElapsed = microtime(1) - $timeStart;
 echo 'unicodeChr4(), M = ' . $M . PHP_EOL;
+echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
+echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
+
+// unicodeChr5(), M = 16777215
+$timeStart = microtime(1);
+$M = 16777215;
+for ($i = 0; $i < $N; $i++) {
+    $char = unicodeChr5($i % $M);
+}
+$timeElapsed = microtime(1) - $timeStart;
+echo 'unicodeChr5(), M = ' . $M . PHP_EOL;
 echo 'Elapsed time: ' . round($timeElapsed, 3) . PHP_EOL;
 echo 'Memory: ' . round(memory_get_peak_usage() / 1024 / 1024, 3) . PHP_EOL . PHP_EOL;
