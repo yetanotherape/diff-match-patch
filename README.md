@@ -147,6 +147,12 @@ of a flexible [matching and patching strategy](http://neil.fraser.name/writing/p
 * PHP 7.3+
 * [Composer](http://getcomposer.org/)
 
+## Installation
+
+```
+composer require yetanotherape/diff-match-patch
+```
+
 ## License
 
 Diff-Match-Patch is licensed under the Apache License 2.0 - see the `LICENSE` file for details
