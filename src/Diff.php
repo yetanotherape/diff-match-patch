@@ -270,7 +270,7 @@ class Diff
             }
         }
 
-        if ($diffs[count($diffs) - 1][1] == '') {
+        if ($diffs[count($diffs) - 1][1] === '') {
             array_pop($diffs);
         }
 
@@ -283,13 +283,13 @@ class Diff
         while ($pointer < count($diffs) - 1) {
             if ($diffs[$pointer - 1][0] == self::EQUAL && $diffs[$pointer + 1][0] == self::EQUAL) {
                 // This is a single edit surrounded by equalities.
-                if (mb_substr($diffs[$pointer][1], -mb_strlen($diffs[$pointer - 1][1])) == $diffs[$pointer - 1][1]) {
+                if (mb_substr($diffs[$pointer][1], -mb_strlen($diffs[$pointer - 1][1])) === $diffs[$pointer - 1][1]) {
                     // Shift the edit over the previous equality.
                     $diffs[$pointer][1] = $diffs[$pointer - 1][1] . mb_substr($diffs[$pointer][1], 0, -mb_strlen($diffs[$pointer - 1][1]));
                     $diffs[$pointer + 1][1] = $diffs[$pointer - 1][1] . $diffs[$pointer + 1][1];
                     array_splice($diffs, $pointer - 1, 1);
                     $changes = true;
-                } elseif (mb_substr($diffs[$pointer][1], 0, mb_strlen($diffs[$pointer + 1][1])) == $diffs[$pointer + 1][1]) {
+                } elseif (mb_substr($diffs[$pointer][1], 0, mb_strlen($diffs[$pointer + 1][1])) === $diffs[$pointer + 1][1]) {
                     // Shift the edit over the next equality.
                     $diffs[$pointer - 1][1] = $diffs[$pointer - 1][1] . $diffs[$pointer + 1][1];
                     $diffs[$pointer][1] = mb_substr($diffs[$pointer][1], mb_strlen($diffs[$pointer + 1][1])) . $diffs[$pointer + 1][1];
@@ -343,7 +343,7 @@ class Diff
                 $bestEdit = $edit;
                 $bestEquality2 = $equality2;
                 $bestScore = $this->cleanupSemanticScore($equality1, $edit) + $this->cleanupSemanticScore($edit, $equality2);
-                while ($edit && $equality2 && mb_substr($edit, 0, 1) == mb_substr($equality2, 0, 1)) {
+                while ($edit && $equality2 && mb_substr($edit, 0, 1) === mb_substr($equality2, 0, 1)) {
                     $equality1 .= mb_substr($edit, 0, 1);
                     $edit = mb_substr($edit, 1) . mb_substr($equality2, 0, 1);
                     $equality2 = mb_substr($equality2, 1);
@@ -356,16 +356,16 @@ class Diff
                         $bestEquality2 = $equality2;
                     }
                 }
-                if ($diffs[$pointer - 1][1] != $bestEquality1) {
+                if ($diffs[$pointer - 1][1] !== $bestEquality1) {
                     // We have an improvement, save it back to the diff.
-                    if ($bestEquality1 != '') {
+                    if ($bestEquality1 !== '') {
                         $diffs[$pointer - 1][1] = $bestEquality1;
                     } else {
                         array_splice($diffs, $pointer - 1, 1);
                         $pointer -= 1;
                     }
                     $diffs[$pointer][1] = $bestEdit;
-                    if ($bestEquality2 != '') {
+                    if ($bestEquality2 !== '') {
                         $diffs[$pointer + 1][1] = $bestEquality2;
                     } else {
                         array_splice($diffs, $pointer + 1, 1);
@@ -391,7 +391,7 @@ class Diff
      */
     protected function cleanupSemanticScore($one, $two)
     {
-        if ($one == '' || $two == '') {
+        if ($one === '' || $two === '') {
             // Edges are the best.
             return 6;
         }
@@ -472,7 +472,7 @@ class Diff
                 }
                 // Eliminate an equality that is smaller or equal to the edits on both sides of it.
                 if (
-                    $lastequality != '' &&
+                    $lastequality !== null &&
                     mb_strlen($lastequality) <= max($length_insertions1, $length_deletions1) &&
                     mb_strlen($lastequality) <= max($length_insertions2, $length_deletions2)
                 ) {
@@ -623,7 +623,7 @@ class Diff
                 // <ins>A</ins><del>B</del>X<del>C</del>
                 // TODO refactor condition
                 if (
-                    $lastequality != '' &&
+                    $lastequality !== null &&
                     (
                         ($pre_ins && $pre_del && $post_ins && $post_del) ||
                         (
@@ -797,7 +797,7 @@ class Diff
         $pointer = 0;
         $tokens = explode("\t", $delta);
         foreach ($tokens as $token) {
-            if ($token == '') {
+            if ($token === '') {
                 // Blank tokens are ok (from a trailing \t).
                 continue;
             }
@@ -824,7 +824,7 @@ class Diff
                     $text = mb_substr($text1, $pointer, $n);
                     $pointer += $n;
                     $diffs[] = array(
-                        $op == '=' ? self::EQUAL : self::DELETE,
+                        $op === '=' ? self::EQUAL : self::DELETE,
                         $text,
                     );
                     break;
@@ -954,8 +954,8 @@ class Diff
         }
 
         // Check for equality (speedup).
-        if ($text1 == $text2) {
-            if ($text1 != '') {
+        if ($text1 === $text2) {
+            if ($text1 !== '') {
                 $this->setChanges(array(
                     array(self::EQUAL, $text1),
                 ));
@@ -966,7 +966,7 @@ class Diff
 
         $prevInternalEncoding = mb_internal_encoding();
         $newInternalEncoding = 'UCS-2LE';
-        if ($prevInternalEncoding != $newInternalEncoding) {
+        if ($prevInternalEncoding !== $newInternalEncoding) {
             mb_internal_encoding($newInternalEncoding);
 
             $errorReportingLevel = error_reporting();
@@ -1012,14 +1012,14 @@ class Diff
         $diffs = $this->compute($text1, $text2, $checklines, $deadline);
 
         // Restore the prefix and suffix.
-        if ($commonPrefix != '') {
+        if ($commonPrefix !== '') {
             array_unshift($diffs, array(self::EQUAL, $commonPrefix));
         }
-        if ($commonSuffix != '') {
+        if ($commonSuffix !== '') {
             array_push($diffs, array(self::EQUAL, $commonSuffix));
         }
 
-        if ($newInternalEncoding != $prevInternalEncoding) {
+        if ($newInternalEncoding !== $prevInternalEncoding) {
             mb_internal_encoding($prevInternalEncoding);
             foreach ($diffs as &$change) {
                 $change[1] = iconv($newInternalEncoding, $prevInternalEncoding, $change[1]);
@@ -1049,14 +1049,14 @@ class Diff
      */
     protected function compute($text1, $text2, $checklines, $deadline)
     {
-        if ($text1 == '') {
+        if ($text1 === '') {
             // Just add some text (speedup).
             return array(
                 array(self::INSERT, $text2),
             );
         }
 
-        if ($text2 == '') {
+        if ($text2 === '') {
             // Just delete some text (speedup).
             return array(
                 array(self::DELETE, $text1),
@@ -1249,7 +1249,7 @@ class Diff
                     $x1 = $v1[$k1Offset - 1] + 1;
                 }
                 $y1 = $x1 - $k1;
-                while ($x1 < $text1Length && $y1 < $text2Length && mb_substr($text1, $x1, 1) == mb_substr($text2, $y1, 1)) {
+                while ($x1 < $text1Length && $y1 < $text2Length && mb_substr($text1, $x1, 1) === mb_substr($text2, $y1, 1)) {
                     $x1++;
                     $y1++;
                 }
@@ -1282,7 +1282,7 @@ class Diff
                     $x2 = $v2[$k2Offset - 1] + 1;
                 }
                 $y2 = $x2 - $k2;
-                while ($x2 < $text1Length && $y2 < $text2Length && mb_substr($text1, -$x2 - 1, 1) == mb_substr($text2, -$y2 - 1, 1)) {
+                while ($x2 < $text1Length && $y2 < $text2Length && mb_substr($text1, -$x2 - 1, 1) === mb_substr($text2, -$y2 - 1, 1)) {
                     $x2++;
                     $y2++;
                 }

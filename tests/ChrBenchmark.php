@@ -70,7 +70,7 @@ function unicodeChr4($code)
 
 function unicodeOrd1($char)
 {
-    if (mb_internal_encoding() != 'UCS-4LE') {
+    if (mb_internal_encoding() !== 'UCS-4LE') {
         $char = iconv(mb_internal_encoding(), 'UCS-4LE', $char);
     }
     $code = 0;
