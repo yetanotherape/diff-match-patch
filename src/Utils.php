@@ -38,12 +38,8 @@ class Utils
      * @return string Char with given code
      */
     public static function unicodeChr($code) {
-        // TODO this works by order of magnitude slower then chr()
-        $code = sprintf("%04x", $code);
-        $char = json_decode('"\u'.$code.'"');
-        $char = iconv('UTF-8', mb_internal_encoding(), $char);
-
-        return $char;
+        // TODO this works by order of magnitude slower than mb_chr()
+        return iconv('UCS-4LE', mb_internal_encoding(), pack('V', $code));
     }
 
     /**
@@ -54,16 +50,17 @@ class Utils
      * @return int Code of given char.
      */
     public static function unicodeOrd($char) {
-        if (mb_internal_encoding() != 'UCS-2LE') {
-            $char = iconv(mb_internal_encoding(), 'UCS-2LE', $char);
+        $internalEncoding = mb_internal_encoding();
+        if ($internalEncoding === 'UCS-2LE') {
+            $code = unpack('v', $char);
+        } else {
+            if ($internalEncoding !== 'UCS-4LE') {
+                $char = iconv($internalEncoding, 'UCS-4LE', $char);
+            }
+            $code = unpack('V', $char);
         }
 
-        $code = 0;
-        for ($i = 0; $i < strlen($char); $i++) {
-            $code += ord($char[$i]) * pow(256, $i);
-        }
-
-        return $code;
+        return $code[1];
     }
 
     /**
