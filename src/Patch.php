@@ -46,18 +46,18 @@ class Patch
      */
     protected $diff;
     /**
-     * @var Match
+     * @var Matcher
      */
     protected $match;
 
     /**
      * @param Diff|null $diff
-     * @param Match|null $match
+     * @param Matcher|null $match
      */
-    public function __construct(Diff $diff = null, Match $match = null)
+    public function __construct(Diff $diff = null, Matcher $match = null)
     {
         if (!isset($match)) {
-            $match = new Match();
+            $match = new Matcher();
         }
         if (!isset($diff)) {
             $diff = new Diff();
@@ -100,7 +100,7 @@ class Patch
     }
 
     /**
-     * @return Match
+     * @return Matcher
      */
     protected function getMatch()
     {

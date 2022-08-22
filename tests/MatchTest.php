@@ -29,14 +29,14 @@ namespace DiffMatchPatch;
 class MatchTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Match
+     * @var Matcher
      */
     protected $m;
 
     protected  function setUp() {
         mb_internal_encoding('UTF-8');
 
-        $this->m = new Match();
+        $this->m = new Matcher();
     }
 
     public function testAlphabet()

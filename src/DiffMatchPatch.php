@@ -66,7 +66,7 @@ class DiffMatchPatch
      */
     protected $diff;
     /**
-     * @var Match
+     * @var Matcher
      */
     protected $match;
     /**
@@ -154,7 +154,7 @@ class DiffMatchPatch
     public function __construct()
     {
         $this->diff = new Diff();
-        $this->match = new Match();
+        $this->match = new Matcher();
         $this->patch = new Patch($this->diff, $this->match);
     }
 

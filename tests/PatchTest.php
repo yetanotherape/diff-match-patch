@@ -37,7 +37,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
      */
     protected $p;
     /**
-     * @var Match
+     * @var Matcher
      */
     protected $m;
 
@@ -45,7 +45,7 @@ class PatchTest extends \PHPUnit_Framework_TestCase
         mb_internal_encoding('UTF-8');
 
         $this->d = new Diff();
-        $this->m = new Match();
+        $this->m = new Matcher();
         // Assumes that Match->maxBits is 32.
         $this->m->setMaxBits(32);
         $this->p = new Patch($this->d, $this->m);
