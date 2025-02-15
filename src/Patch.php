@@ -54,7 +54,7 @@ class Patch
      * @param Diff|null $diff
      * @param Matcher|null $matcher
      */
-    public function __construct(Diff $diff = null, Matcher $matcher = null)
+    public function __construct(?Diff $diff = null, ?Matcher $matcher = null)
     {
         if (!isset($matcher)) {
             $matcher = new Matcher();
