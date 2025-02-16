@@ -715,6 +715,15 @@ class DiffTest extends TestCase
             $this->d->main("abc", "abc", false)->getChanges()
         );
 
+        // Check ===
+        $this->assertEquals(
+            array(
+                array(Diff::INSERT, "0"),
+                array(Diff::EQUAL, "1"),
+            ),
+            $this->d->main("1", "01", false)->getChanges()
+        );
+
         // Check '0' strings
         $this->assertEquals(
             array(
