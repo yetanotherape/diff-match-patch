@@ -1,6 +1,6 @@
 # Diff-Match-Patch 
-[![Build Status](https://travis-ci.org/yetanotherape/diff-match-patch.svg?branch=master)](https://travis-ci.org/yetanotherape/diff-match-patch)
-[![Latest Stable Version](https://poser.pugx.org/yetanotherape/diff-match-patch/v/stable)](https://packagist.org/packages/yetanotherape/diff-match-patch)
+[![Latest Stable Version](https://poser.pugx.org/yetanotherape/diff-match-patch/v)](https://packagist.org/packages/yetanotherape/diff-match-patch)
+[![CI Status](https://github.com/yetanotherape/diff-match-patch/workflows/CI/badge.svg)](https://github.com/yetanotherape/diff-match-patch/actions)
 [![Total Downloads](https://poser.pugx.org/yetanotherape/diff-match-patch/downloads)](https://packagist.org/packages/yetanotherape/diff-match-patch)
 
 The Diff Match and Patch libraries offer robust algorithms to perform the operations required for synchronizing plain 
