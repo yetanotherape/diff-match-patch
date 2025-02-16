@@ -7,13 +7,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY composer.json /app
-RUN composer install
+RUN composer install --no-progress --no-interaction --prefer-dist
 
 COPY . /app
 CMD [ "/bin/bash" ]
 
 # Usage:
-# export PHP_VERSION=7.2
-# docker build -t dmp:${PHP_VERSION} --build-arg PHP_VERSION=${PHP_VERSION} .
-# docker run -it --rm dmp:${PHP_VERSION} ./vendor/bin/phpunit
-# docker run -it --rm -v `pwd`/src:/app/src -v `pwd`/tests:/app/tests dmp:${PHP_VERSION}
+# export PHP_VERSION=7.3
+# docker build --build-arg PHP_VERSION=${PHP_VERSION} -t dmp:${PHP_VERSION} .
+# docker run --rm -v ./src:/app/src -v ./tests:/app/tests dmp:${PHP_VERSION} ./vendor/bin/phpunit
+# docker run -it --rm -v ./src:/app/src -v ./tests:/app/tests dmp:${PHP_VERSION}
