@@ -172,7 +172,7 @@ class DiffToolkit {
             $longtext = $text2;
         }
 
-        if (mb_strlen($longtext) < 4 || mb_strlen($shorttext) * 2 < mb_strlen(mb_strlen($longtext))) {
+        if (mb_strlen($longtext) < 4 || mb_strlen($shorttext) * 2 < mb_strlen($longtext)) {
             // Pointless
             return null;
         }
